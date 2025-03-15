@@ -1,240 +1,139 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+const pool = require('../db');
 
-let eleves = [];
-
-const generateId = () => {
-    let id;
+const generateId = async () => {
+  let id;
+  let exists = true;
+  while (exists) {
     id = Math.floor(10000000 + Math.random() * 90000000);
-    while (eleves.some(eleve => eleve.id === id)) {
-        id = Math.floor(10000000 + Math.random() * 90000000);
-    }
-    return id;
+    const result = await pool.query('SELECT 1 FROM eleves WHERE id = $1', [id]);
+    exists = result.rowCount > 0;
+  }
+  return id;
 };
 
-const getEleves = (req, res) => {
-    res.json(eleves);
+const getEleves = async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM eleves');
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la récupération des élèves' });
+  }
 };
 
 const addEleve = async (req, res) => {
-    const { name, firstname, classe, cours, password } = req.body;
+  const { name, firstname, classe_id, password } = req.body;
 
-    if (!name || !firstname || !classe || !password) {
-        return res.status(400).json({ error: 'Invalid input: missing fields' });
-    }
+  if (!name || !firstname || !classe_id || !password) {
+    return res.status(400).json({ error: 'Invalid input: missing fields' });
+  }
 
-    const hasNumber = /\d/;
-    if (hasNumber.test(name) || hasNumber.test(firstname)) {
-        return res.status(400).json({ error: 'Invalid input: name and firstname must not contain numbers' });
-    }
-
-    if (typeof name !== 'string') {
-        return res.status(400).json({ error: 'Invalid input: name must be a string' });
-    }
-
-    if (typeof firstname !== 'string') {
-        return res.status(400).json({ error: 'Invalid input: firstname must be a string' });
-    }
-
-    if (typeof classe !== 'string') {
-        return res.status(400).json({ error: 'Invalid input: classe must be a string' });
-    }
-
-
-    if (!Array.isArray(cours)) {
-        return res.status(400).json({ error: 'Invalid input: cours must be an array' });
-    }
-
-    if (typeof password !== 'string') {
-        return res.status(400).json({ error: 'Invalid input: password must be a string' });
-    }
-
-    try {
-        const hashedMdp = await bcrypt.hash(password, 10);
-        const eleve = { id: generateId(), name, firstname, password: hashedMdp, classe, cours };
-        eleves.push(eleve);
-        console.log(eleves);
-        res.status(201).json(eleve);
-    } catch (error) {
-        res.status(500).json({ error: 'Error hashing password' });
-    }
+  try {
+    const id = await generateId();
+    const hashedMdp = await bcrypt.hash(password, 10);
+    const result = await pool.query(
+      'INSERT INTO eleves (id, name, firstname, classe_id, password) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [id, name, firstname, classe_id, hashedMdp]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de l\'ajout de l\'élève' });
+  }
 };
 
-const addEleveList = async (req, res) => {
-    const newEleves = req.body;
+const deleteEleve = async (req, res) => {
+  const { id } = req.body;
+  if (typeof id !== 'number') {
+    return res.status(400).json({ error: 'Invalid input: id must be a number' });
+  }
 
-    if (!Array.isArray(newEleves)) {
-        return res.status(400).json({ error: 'Invalid input: body must be an array of students' });
+  try {
+    const result = await pool.query('DELETE FROM eleves WHERE id = $1 RETURNING *', [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Student not found' });
     }
-
-    try {
-        for (const eleve of newEleves) {
-            const { name, firstname, classe, cours, password } = eleve;
-
-            if (typeof name !== 'string') {
-                return res.status(400).json({ error: `Invalid input: name must be a string for student ${JSON.stringify(eleve)}` });
-            }
-
-            if (typeof firstname !== 'string') {
-                return res.status(400).json({ error: `Invalid input: firstname must be a string for student ${JSON.stringify(eleve)}` });
-            }
-
-            if (typeof classe !== 'string') {
-                return res.status(400).json({ error: 'Invalid input: classe must be a string' });
-            }
-        
-        
-            if (!Array.isArray(cours)) {
-                return res.status(400).json({ error: 'Invalid input: cours must be an array' });
-            }
-
-            if (typeof password !== 'string') {
-                return res.status(400).json({ error: `Invalid input: password must be a string for student ${JSON.stringify(eleve)}` });
-            }
-
-            const hashedMdp = await bcrypt.hash(password, 10);
-            eleves.push({ id: generateId(), name, firstname, password: hashedMdp, classe, cours });
-        }
-        console.log(eleves);
-        res.status(201).json(eleves);
-    } catch (error) {
-        res.status(500).json({ error: 'Error hashing passwords' });
-    }
-};
-
-const deleteEleve = (req, res) => {
-    const { id } = req.body;
-    if (typeof id !== 'number') {
-        return res.status(400).json({ error: 'Invalid input: id must be a number' });
-    }
-
-    const index = eleves.findIndex(eleve => eleve.id === id);
-
-    if (index === -1) {
-        return res.status(404).json({ error: 'Student not found' });
-    }
-
-    eleves.splice(index, 1);
     res.status(200).json({ message: 'Student deleted successfully' });
-};
-
-const deleteEleveList = (req, res) => {
-    const ids = req.body;
-
-    if (!Array.isArray(ids)) {
-        return res.status(400).json({ error: 'Invalid input: body must be an array of ids' });
-    }
-
-    try {
-        ids.forEach(id => {
-            console.log(`Trying to delete student with id: ${id}`);
-            const index = eleves.findIndex(eleve => eleve.id === id);
-            if (index !== -1) {
-                console.log(`Deleting student with id: ${id}`);
-                eleves.splice(index, 1);
-            } else {
-                console.log(`Student with id: ${id} not found`);
-            }
-        });
-        res.status(200).json({ message: 'Students deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error deleting students' });
-    }
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la suppression de l\'élève' });
+  }
 };
 
 const updateEleve = async (req, res) => {
-    const { id } = req.params;
-    const { name, firstname, classes, password } = req.body;
+  const { id } = req.params;
+  const { name, firstname, classe_id, password } = req.body;
 
-    const eleve = eleves.find(eleve => eleve.id === parseInt(id));
-
-    if (!eleve) {
-        return res.status(404).json({ error: 'Student not found' });
+  try {
+    const eleve = await pool.query('SELECT * FROM eleves WHERE id = $1', [id]);
+    if (eleve.rowCount === 0) {
+      return res.status(404).json({ error: 'Student not found' });
     }
 
-    if (name && typeof name !== 'string') {
-        return res.status(400).json({ error: 'Invalid input: name must be a string' });
-    }
+    const updatedEleve = {
+      name: name || eleve.rows[0].name,
+      firstname: firstname || eleve.rows[0].firstname,
+      classe_id: classe_id || eleve.rows[0].classe_id,
+      password: password ? await bcrypt.hash(password, 10) : eleve.rows[0].password,
+    };
 
-    if (firstname && typeof firstname !== 'string') {
-        return res.status(400).json({ error: 'Invalid input: firstname must be a string' });
-    }
+    const result = await pool.query(
+      'UPDATE eleves SET name = $1, firstname = $2, classe_id = $3, password = $4 WHERE id = $5 RETURNING *',
+      [updatedEleve.name, updatedEleve.firstname, updatedEleve.classe_id, updatedEleve.password, id]
+    );
 
-    if (classes && !Array.isArray(classes)) {
-        return res.status(400).json({ error: 'Invalid input: classes must be an array' });
-    }
-
-    if (password && typeof password !== 'string') {
-        return res.status(400).json({ error: 'Invalid input: password must be a string' });
-    }
-
-    try {
-        if (name) eleve.name = name;
-        if (firstname) eleve.firstname = firstname;
-        if (classes) eleve.classes = classes;
-        if (password) eleve.password = await bcrypt.hash(password, 10);
-
-        res.status(200).json(eleve);
-    } catch (error) {
-        res.status(500).json({ error: 'Error updating student' });
-    }
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'élève' });
+  }
 };
 
-const getEleveById = (req, res, internalCall = false) => {
-    const { id } = req.params;
-    const eleve = eleves.find(eleve => eleve.id === parseInt(id));
-
-    if (!eleve) {
-        if (internalCall) {
-            return null;
-        }
-        return res.status(404).json({ error: 'Student not found' });
+const getEleveById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM eleves WHERE id = $1', [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Student not found' });
     }
-
-    if (internalCall) {
-        return eleve;
-    }
-
-    res.status(200).json(eleve);
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la récupération de l\'élève' });
+  }
 };
 
 const loginEleve = async (req, res) => {
-    const { id, password } = req.body;
+  const { id, password } = req.body;
 
-    if (typeof id !== 'number') {
-        return res.status(400).json({ error: 'Invalid input: id must be a number' });
+  if (typeof id !== 'number') {
+    return res.status(400).json({ error: 'Invalid input: id must be a number' });
+  }
+
+  if (typeof password !== 'string') {
+    return res.status(400).json({ error: 'Invalid input: password must be a string' });
+  }
+
+  try {
+    const result = await pool.query('SELECT * FROM eleves WHERE id = $1', [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Student not found' });
     }
 
-    if (typeof password !== 'string') {
-        return res.status(400).json({ error: 'Invalid input: password must be a string' });
+    const eleve = result.rows[0];
+    const match = await bcrypt.compare(password, eleve.password);
+    if (!match) {
+      return res.status(401).json({ error: 'Invalid password' });
     }
 
-    const eleve = eleves.find(eleve => eleve.id === id);
-
-    if (!eleve) {
-        return res.status(404).json({ error: 'Student not found' });
-    }
-
-    try {
-        const match = await bcrypt.compare(password, eleve.password);
-        if (!match) {
-            return res.status(401).json({ error: 'Invalid password' });
-        }
-        
-        const { password: _, ...eleveWithoutPassword } = eleve;
-        res.status(200).json({ message: 'Login successful', eleve: eleveWithoutPassword });
-    } catch (error) {
-        res.status(500).json({ error: 'Error checking password' });
-    }
+    const { password: _, ...eleveWithoutPassword } = eleve;
+    res.status(200).json({ message: 'Login successful', eleve: eleveWithoutPassword });
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la vérification du mot de passe' });
+  }
 };
 
 module.exports = {
-    getEleves,
-    addEleve,
-    addEleveList,
-    deleteEleve,
-    deleteEleveList,
-    updateEleve,
-    getEleveById,
-    loginEleve
+  getEleves,
+  addEleve,
+  deleteEleve,
+  updateEleve,
+  getEleveById,
+  loginEleve
 };
-
