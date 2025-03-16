@@ -1,4 +1,13 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 const Home = () => {
+  const navigate = useNavigate();
+
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
+
   return (
     <div className="flex h-screen font-sans">
       {/* Left Side */}
@@ -17,13 +26,15 @@ const Home = () => {
           <h1 className="text-4xl font-bold text-blue-900">BIENVENUE</h1>
           <h2 className="text-xl font-semibold text-orange-500 mt-2 uppercase">Sur la plateforme web de l'Efrei</h2>
           <p className="mt-4 text-gray-600 text-lg">Retrouvez l'ensemble de vos <span className="font-semibold">services sur myEfrei</span>.</p>
-          <button className="mt-6 bg-blue-900 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-800 transition-all shadow-md">
+          <button
+            onClick={handleLoginClick}
+            className="mt-6 bg-blue-900 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-800 transition-all shadow-md"
+          >
             SE CONNECTER
           </button>
         </div>
         <footer className="mt-10 text-gray-400 text-sm text-center">
           <p>© 2025 Efrei | Établissement d’enseignement supérieur technique privé</p>
-          <a href="#" className="text-blue-600 hover:underline">Données personnelles</a>
         </footer>
       </div>
     </div>

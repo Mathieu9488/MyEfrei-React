@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const  { getEleves, addEleve, deleteEleve, updateEleve, getEleveById, loginEleve } = require('../controllers/eleves.js')
+const  { getEleves, addEleve, deleteEleve, updateEleve, getEleveById, loginEleve } = require('../../controllers/admin/eleves.js')
 
 router.get("/", getEleves);
 router.post("/", addEleve);
