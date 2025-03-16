@@ -17,8 +17,15 @@ export default function Login() {
       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/login`, { id: parseInt(id), password });
       console.log(response.data);
       login(response.data.token, response.data.user);
-      // Rediriger l'utilisateur vers le menu en cas de succès
-      navigate('/menu');
+      // Rediriger l'utilisateur vers la page appropriée en fonction de son rôle
+      const role = response.data.user.role;
+      if (role === 'admin') {
+        navigate('/admin-pannel');
+      } else if (role === 'prof') {
+        navigate('/planning');
+      } else {
+        navigate('/menu');
+      }
     } catch (error) {
       // Afficher le message d'erreur en cas d'échec
       setErrorMessage("Informations de connexion incorrectes");
@@ -92,7 +99,7 @@ export default function Login() {
 
         {/* Conditions d'utilisation */}
         <p className="text-xs text-gray-500 mt-4 text-center">
-          En me connectant, j'accepte les <a href="#" className="text-blue-500">conditions d'utilisation</a>.
+          En me connectant, j'accepte les conditions d'utilisation.
         </p>
       </div>
     </div>

@@ -17,7 +17,7 @@ const AppRoutes = () => {
         <Route path="/menu" element={<ProtectedRoute roles={['eleve', 'admin', 'prof']}><Menu /></ProtectedRoute>} />
         <Route path="/planning" element={<ProtectedRoute roles={['eleve', 'admin', 'prof']}><Planning /></ProtectedRoute>} />
         <Route path="/notes" element={<ProtectedRoute roles={['eleve', 'admin', 'prof']}><Notes /></ProtectedRoute>} />
-        <Route path="/admin-pannel" element={<ProtectedRoute roles={['eleve', 'admin']}><AdminPannel /></ProtectedRoute>} />
+        <Route path="/admin-pannel" element={<ProtectedRoute roles={['eleve', 'admin', 'prof']}><AdminPannel /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

@@ -1,31 +1,13 @@
-// filepath: /c:/Users/mathi/OneDrive/Documents/Cours/MyEfrei-React/my-efrei/src/pages/home.js
-import '../css/menu.css';
-import Navbar from '../components/Navbar';
+import Navbar from "../components/Navbar";
 
-function Menu() {
+export default function MyEfreiPage() {
   return (
-    <div className="home-container">
+    <div className="w-full h-screen">
       <Navbar />
-      <header className="home-header">
-        <h1>Bienvenue sur MyEfrei</h1>
-        <p>Retrouvez toutes les informations de votre école en un seul endroit.</p>
-      </header>
-      <section className="home-section">
-        <h2>Événements</h2>
-        <div className="event-card">
-          <p className="event-title">Repair Café - 20 Février</p>
-          <p className="event-desc">Un objet à réparer ? Viens nous aider !</p>
-        </div>
-      </section>
-      <section className="home-section">
-        <h2>Actualités</h2>
-        <div className="news-card">
-          <p className="news-title">Tech Alert</p>
-          <p className="news-desc">Talk sur le hacking planétaire...</p>
-        </div>
-      </section>
+      <div className="p-4">
+        <h1 className="text-2xl font-semibold">Accueil</h1>
+        <div className="w-full h-96 bg-gray-100 mt-4 rounded-lg"></div>
+      </div>
     </div>
   );
 }
-
-export default Menu;
