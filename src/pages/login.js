@@ -1,19 +1,27 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/login`, { id: parseInt(id), password });
       console.log(response.data);
-      // Rediriger l'utilisateur en fonction de son rôle
+      login(response.data.token, response.data.user);
+      // Rediriger l'utilisateur vers le menu en cas de succès
+      navigate('/menu');
     } catch (error) {
-      console.error(error.response.data);
+      // Afficher le message d'erreur en cas d'échec
+      setErrorMessage("Informations de connexion incorrectes");
     }
   };
 
@@ -61,6 +69,13 @@ export default function Login() {
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         </div>
+
+        {/* Message d'erreur */}
+        {errorMessage && (
+          <div className="mb-4 text-red-500">
+            {errorMessage}
+          </div>
+        )}
 
         {/* Lien Identifiants oubliés */}
         <div className="text-sm text-blue-500 mb-4">

@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const pool = require('../db');
 
 const loginUser = async (req, res) => {
@@ -33,10 +34,14 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
+    const role = user.role || (result.command === 'SELECT 1' ? 'eleve' : result.command === 'SELECT 2' ? 'admin' : 'prof');
+    const token = jwt.sign({ id: user.id, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
     const { password: _, ...userWithoutPassword } = user;
-    console.log(userWithoutPassword || "no user found");
-    res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
+    console.log(userWithoutPassword);
+    res.status(200).json({ message: 'Login successful', token, user: userWithoutPassword });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: 'Erreur lors de la vérification du mot de passe' });
   }
 };
