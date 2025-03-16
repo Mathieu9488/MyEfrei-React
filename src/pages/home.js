@@ -1,31 +1,33 @@
-// filepath: /c:/Users/mathi/OneDrive/Documents/Cours/MyEfrei-React/my-efrei/src/pages/home.js
-import '../css/home.css';
-import Navbar from '../components/Navbar';
-
-function Home() {
+const Home = () => {
   return (
-    <div className="home-container">
-      <Navbar />
-      <header className="home-header">
-        <h1>Bienvenue sur MyEfrei</h1>
-        <p>Retrouvez toutes les informations de votre école en un seul endroit.</p>
-      </header>
-      <section className="home-section">
-        <h2>Événements</h2>
-        <div className="event-card">
-          <p className="event-title">Repair Café - 20 Février</p>
-          <p className="event-desc">Un objet à réparer ? Viens nous aider !</p>
+    <div className="flex h-screen font-sans">
+      {/* Left Side */}
+      <div
+        className="w-3/5 text-white flex flex-col items-center justify-center p-10"
+        style={{ backgroundImage: "url('/images/myefrei-background.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
+        <div className="text-5xl font-bold flex flex-col items-center gap-4">
+          <img src="/images/logo-myefrei-pantheon.png" alt="Logo myEfrei" className="w-64 h-64 object-contain" />
         </div>
-      </section>
-      <section className="home-section">
-        <h2>Actualités</h2>
-        <div className="news-card">
-          <p className="news-title">Tech Alert</p>
-          <p className="news-desc">Talk sur le hacking planétaire...</p>
+      </div>
+
+      {/* Right Side */}
+      <div className="w-2/5 bg-white flex flex-col justify-center items-center p-10 text-center shadow-lg">
+        <div className="flex-grow flex flex-col justify-center">
+          <h1 className="text-4xl font-bold text-blue-900">BIENVENUE</h1>
+          <h2 className="text-xl font-semibold text-orange-500 mt-2 uppercase">Sur la plateforme web de l'Efrei</h2>
+          <p className="mt-4 text-gray-600 text-lg">Retrouvez l'ensemble de vos <span className="font-semibold">services sur myEfrei</span>.</p>
+          <button className="mt-6 bg-blue-900 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-800 transition-all shadow-md">
+            SE CONNECTER
+          </button>
         </div>
-      </section>
+        <footer className="mt-10 text-gray-400 text-sm text-center">
+          <p>© 2025 Efrei | Établissement d’enseignement supérieur technique privé</p>
+          <a href="#" className="text-blue-600 hover:underline">Données personnelles</a>
+        </footer>
+      </div>
     </div>
   );
-}
+};
 
 export default Home;

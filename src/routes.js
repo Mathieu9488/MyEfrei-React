@@ -1,6 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/home';
+import Login from './pages/login';
+
+import Menu from './pages/menu';
 import Planning from './pages/planning';
 import Notes from './pages/notes';
 import AdminPannel from './pages/admin-pannel';
@@ -10,6 +13,8 @@ const AppRoutes = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/menu" element={<Menu />} />
         <Route path="/planning" element={<Planning />} />
         <Route path="/notes" element={<Notes />} />
         <Route path="/admin-pannel" element={<AdminPannel />} />
