@@ -6,6 +6,7 @@ const eleves_routes = require("./routes/admin/eleves.js");
 const cours_routes = require("./routes/admin/cours.js");
 const classes_routes = require("./routes/admin/classes.js");
 const login_routes = require("./routes/login.js");
+const professeurs_routes = require("./routes/admin/professeurs.js");
 
 app.use(cors({
   origin: process.env.REACT_APP_FRONTEND_URL, // Remplacez par l'URL de votre frontend
@@ -21,6 +22,7 @@ app.use("/admin/eleves", eleves_routes);
 app.use("/admin/cours", cours_routes);
 app.use("/admin/classes", classes_routes);
 app.use("/login", login_routes);
+app.use("/admin/professeurs", professeurs_routes);
 
 app.listen(3001, () => {
   console.log("Serveur démarré sur le port 3001");

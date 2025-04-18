@@ -29,6 +29,7 @@ const loginUser = async (req, res) => {
       } else {
         // Si non trouvé, vérifier dans la table des professeurs
         result = await pool.query('SELECT * FROM professeurs WHERE id = $1', [id]);
+        console.log("profs :", result)
         if (result.rowCount > 0) {
           role = 'prof';
         } else {
@@ -46,7 +47,7 @@ const loginUser = async (req, res) => {
     const token = jwt.sign({ id: user.id, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     const { password: _, ...userWithoutPassword } = user;
-    console.log(userWithoutPassword, role);
+    console.log(userWithoutPassword, role); 
     res.status(200).json({ message: 'Login successful', token, user: userWithoutPassword });
   } catch (error) {
     console.log(error);

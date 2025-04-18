@@ -1,7 +1,7 @@
 // src/context/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
-import Loading from '../components/Loading'; // Importez le composant Loading
+import Loading from '../components/loading'; // Importez le composant Loading
 
 const AuthContext = createContext();
 

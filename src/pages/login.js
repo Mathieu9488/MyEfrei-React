@@ -24,7 +24,7 @@ export default function Login() {
       } else if (role === 'prof') {
         navigate('/planning');
       } else {
-        navigate('/menu');
+        navigate('/portal');
       }
     } catch (error) {
       // Afficher le message d'erreur en cas d'échec

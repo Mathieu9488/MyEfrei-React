@@ -50,3 +50,9 @@ CREATE TABLE IF NOT EXISTS notes (
   FOREIGN KEY (eleve_id) REFERENCES eleves(id),
   FOREIGN KEY (cours_id) REFERENCES cours(id)
 );
+
+-- Ajout d'un professeur
+INSERT INTO professeurs (id, name, firstname, password) VALUES (10000, 'Melvin', 'Bissor', '$2b$10$QsVCNiUEg48v96Zyo1UYxuaxMpfWixnAoffBkDed.g8rxLI3NCjrS'); -- password: prof
+
+-- Ajout d'un admin
+INSERT INTO admins (id, name, firstname, password) VALUES (1, 'Léa', 'Delacroix', '$2b$10$XwJhrtXWn0Z3BvPB12/R6O457cugSKwId84mnv8hSccQ/CRaZ4ZvS'); -- password: admin

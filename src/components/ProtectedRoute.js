@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import NotFound from '../pages/NotFound';
 
 const ProtectedRoute = ({ children, roles }) => {
   const { auth, loading } = useAuth();
@@ -10,7 +11,7 @@ const ProtectedRoute = ({ children, roles }) => {
 
   if (roles && !roles.includes(auth.role)) {
     console.log("Role required", auth.role);
-    return <Navigate to="/" />;
+    return <NotFound />;
   }
 
   return children;
