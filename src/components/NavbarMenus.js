@@ -18,7 +18,7 @@ export default function NavbarMenus() {
           "GESTION DES CLASSES",
           "GESTION DES PROFESSEURS",
           "GESTION DES MATIÈRES",
-          "GESTION DES ADMINISTRATEURS",
+          "GESTION DES SESSIONS",
         ];
       case 'prof':
         return [
@@ -49,6 +49,7 @@ export default function NavbarMenus() {
     if (path === '/admin/classes') return 'GESTION DES CLASSES';
     if (path === '/admin/professeurs') return 'GESTION DES PROFESSEURS';
     if (path === '/admin/matieres') return 'GESTION DES MATIÈRES';
+    if (path === '/admin/sessions') return 'GESTION DES SESSIONS';
     if (path === '/admin/reports') return 'RAPPORTS';
     if (path === '/admin/settings') return 'PARAMÈTRES';
     if (path === '/prof/planning') return 'PLANNING';
@@ -64,7 +65,6 @@ export default function NavbarMenus() {
     return '';
   };
 
-  // Mettre à jour l'élément actif chaque fois que l'URL change
   useEffect(() => {
     const currentActive = getActiveItemFromPath(location.pathname);
     setActive(currentActive);
@@ -72,7 +72,6 @@ export default function NavbarMenus() {
 
   const menuItems = getMenuItems();
 
-  // Fonction pour gérer la navigation
   const handleNavigation = (item) => {
     setActive(item);
     switch (item) {
@@ -90,6 +89,9 @@ export default function NavbarMenus() {
         break;
       case 'GESTION DES MATIÈRES':
         navigate('/admin/matieres');
+        break;
+      case 'GESTION DES SESSIONS':
+        navigate('/admin/sessions');
         break;
       case 'RAPPORTS':
         navigate('/admin/reports');

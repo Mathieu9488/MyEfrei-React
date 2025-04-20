@@ -37,8 +37,11 @@ CREATE TABLE IF NOT EXISTS matieres (
 
 CREATE TABLE IF NOT EXISTS sessions (
   id SERIAL PRIMARY KEY,
-  matieres_id INTEGER,
-  heure TIMESTAMP,
+  matieres_id INTEGER NOT NULL,
+  date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  salle VARCHAR(50),
   FOREIGN KEY (matieres_id) REFERENCES matieres(id)
 );
 
