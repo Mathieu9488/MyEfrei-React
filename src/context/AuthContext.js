@@ -1,13 +1,12 @@
-// src/context/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
-import Loading from '../components/loading'; // Importez le composant Loading
+import Loading from '../components/Loading';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(null);
-  const [loading, setLoading] = useState(true); // Nouvel état
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedAuth = localStorage.getItem('auth');
@@ -26,10 +25,10 @@ export const AuthProvider = ({ children }) => {
       }
     }
 
-    setLoading(false); // Fin du chargement
+    setLoading(false);
   }, []);
 
-  if (loading) return <Loading /> // Ne pas afficher ProtectedRoute tant que c'est en cours
+  if (loading) return <Loading />
 
 
   const login = (token, user) => {

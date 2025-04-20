@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
-import { useAuth } from '../context/AuthContext'; // Importez le hook useAuth
-import { useNavigate } from 'react-router-dom'; // Importez le hook useNavigate
+import { useAuth } from '../context/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function NavbarMenus() {
-  const [active, setActive] = useState("PLANNING");
-  const { auth } = useAuth(); // Accédez au rôle de l'utilisateur
-  const navigate = useNavigate(); // Utilisez le hook useNavigate
+  const [active, setActive] = useState("");
+  const { auth } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Définir les éléments de menu en fonction du rôle de l'utilisateur
   const getMenuItems = () => {
     switch (auth?.role) {
       case 'admin':
@@ -18,7 +18,7 @@ export default function NavbarMenus() {
           "GESTION DES CLASSES",
           "GESTION DES PROFESSEURS",
           "GESTION DES MATIÈRES",
-          "GESTION DES COURS"
+          "GESTION DES ADMINISTRATEURS",
         ];
       case 'prof':
         return [
@@ -43,6 +43,33 @@ export default function NavbarMenus() {
     }
   };
 
+  const getActiveItemFromPath = (path) => {
+    if (path === '/portal') return 'ACCUEIL';
+    if (path === '/admin/eleves') return 'GESTION DES ÉLÈVES';
+    if (path === '/admin/classes') return 'GESTION DES CLASSES';
+    if (path === '/admin/professeurs') return 'GESTION DES PROFESSEURS';
+    if (path === '/admin/matieres') return 'GESTION DES MATIÈRES';
+    if (path === '/admin/reports') return 'RAPPORTS';
+    if (path === '/admin/settings') return 'PARAMÈTRES';
+    if (path === '/prof/planning') return 'PLANNING';
+    if (path === '/prof/courses') return 'COURS';
+    if (path === '/prof/grades') return 'NOTES';
+    if (path === '/prof/messages') return 'MESSAGES';
+    if (path === '/eleve/school') return 'SCOLARITÉ';
+    if (path === '/eleve/school-info') return 'L\'ÉCOLE';
+    if (path === '/eleve/student-life') return 'VIE ÉTUDIANTE';
+    if (path === '/eleve/internships') return 'STAGES ET ALTERNANCES';
+    if (path === '/eleve/tools') return 'OUTILS';
+    if (path === '/eleve/help') return 'AIDES';
+    return '';
+  };
+
+  // Mettre à jour l'élément actif chaque fois que l'URL change
+  useEffect(() => {
+    const currentActive = getActiveItemFromPath(location.pathname);
+    setActive(currentActive);
+  }, [location.pathname]);
+
   const menuItems = getMenuItems();
 
   // Fonction pour gérer la navigation
@@ -54,6 +81,15 @@ export default function NavbarMenus() {
         break;
       case 'GESTION DES ÉLÈVES':
         navigate('/admin/eleves');
+        break;
+      case 'GESTION DES CLASSES':
+        navigate('/admin/classes');
+        break;
+      case 'GESTION DES PROFESSEURS':
+        navigate('/admin/professeurs');
+        break;
+      case 'GESTION DES MATIÈRES':
+        navigate('/admin/matieres');
         break;
       case 'RAPPORTS':
         navigate('/admin/reports');
@@ -105,7 +141,7 @@ export default function NavbarMenus() {
               className={`hover:text-orange-500 transition ${
                 active === item ? "text-orange-500" : ""
               }`}
-              onClick={() => handleNavigation(item)} // Utilisez handleNavigation pour changer de page
+              onClick={() => handleNavigation(item)}
             >
               {item}
               {["SCOLARITÉ", "L'ÉCOLE", "VIE ÉTUDIANTE", "STAGES ET ALTERNANCES", "OUTILS", "AIDES"].includes(item) && (

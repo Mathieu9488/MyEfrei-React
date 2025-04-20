@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS professeurs (
   password VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS cours (
+CREATE TABLE IF NOT EXISTS matieres (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   professeur_id INTEGER,
@@ -37,18 +37,18 @@ CREATE TABLE IF NOT EXISTS cours (
 
 CREATE TABLE IF NOT EXISTS sessions (
   id SERIAL PRIMARY KEY,
-  cours_id INTEGER,
+  matieres_id INTEGER,
   heure TIMESTAMP,
-  FOREIGN KEY (cours_id) REFERENCES cours(id)
+  FOREIGN KEY (matieres_id) REFERENCES matieres(id)
 );
 
 CREATE TABLE IF NOT EXISTS notes (
   id SERIAL PRIMARY KEY,
   eleve_id INTEGER,
-  cours_id INTEGER,
+  matieres_id INTEGER,
   note INTEGER NOT NULL,
   FOREIGN KEY (eleve_id) REFERENCES eleves(id),
-  FOREIGN KEY (cours_id) REFERENCES cours(id)
+  FOREIGN KEY (matieres_id) REFERENCES matieres(id)
 );
 
 -- Ajout d'un professeur
