@@ -35,7 +35,7 @@ export default function PlanningPage() {
         if (auth.role === 'eleve') {
           apiRoute = `${process.env.REACT_APP_BACKEND_URL}/eleve/eleves/${auth.user.id}`;
         } else if (auth.role === 'prof') {
-          apiRoute = `${process.env.REACT_APP_BACKEND_URL}/admin/professeurs/${auth.user.id}`;
+          apiRoute = `${process.env.REACT_APP_BACKEND_URL}/prof/professeurs/${auth.user.id}`;
         } else {
           throw new Error("Rôle non supporté");
         }
@@ -49,30 +49,9 @@ export default function PlanningPage() {
         
         const data = await response.json();
         
-        if (auth.role === 'eleve') {
-          if (data.emploiDuTemps) {
-            setEmploiDuTemps(data.emploiDuTemps);
-          } else {
-            throw new Error("Format de données incorrect pour l'élève");
-          }
-        } else if (auth.role === 'prof' && data.cours) {
-          const formattedData = {};
-          data.cours.forEach(cours => {
-            const dateKey = cours.date;
-            if (!formattedData[dateKey]) formattedData[dateKey] = [];
-            
-            formattedData[dateKey].push({
-              id: cours.id,
-              start_time: cours.start_time,
-              end_time: cours.end_time,
-              salle: cours.salle,
-              matiere: {
-                id: cours.matiere_id,
-                name: cours.matiere_name
-              }
-            });
-          });
-          setEmploiDuTemps(formattedData);
+        // Traitement uniforme pour élèves et professeurs car les deux APIs renvoient maintenant data.emploiDuTemps
+        if (data.emploiDuTemps) {
+          setEmploiDuTemps(data.emploiDuTemps);
         } else {
           throw new Error("Format de données incorrect");
         }
@@ -180,7 +159,6 @@ export default function PlanningPage() {
 
                 {weekDays.map((day) => (
                 <div key={day.toString()} className="border-l relative">
-                    {/* Lignes horaires */}
                     {hours.map((hour) => (
                     <div key={hour} className="h-16 border-t"></div>
                     ))}
@@ -222,15 +200,23 @@ export default function PlanningPage() {
                             <div className="text-xs text-gray-600 font-medium">
                             {formatTime(session.start_time)} - {formatTime(session.end_time)}
                             </div>
-                            {session.professeur && (
-                            <div className="text-xs text-gray-700 mt-0.5 italic truncate">
-                                {`${session.professeur.firstname} ${session.professeur.name}`}
-                            </div>
+                            
+                            {auth.role === 'eleve' && session.professeur && (
+                                <div className="text-xs text-gray-700 mt-0.5 italic truncate">
+                                    {`${session.professeur.firstname} ${session.professeur.name}`}
+                                </div>
                             )}
+                            
+                            {auth.role === 'prof' && session.classe && (
+                                <div className="text-xs text-gray-700 mt-0.5 italic truncate">
+                                    {session.classe.name}
+                                </div>
+                            )}
+                            
                             {session.salle && (
-                            <div className="mt-auto text-xs bg-white bg-opacity-50 rounded px-1 py-0.5 font-medium text-gray-700 inline-flex self-start">
-                                Salle {session.salle}
-                            </div>
+                                <div className="mt-auto text-xs bg-white bg-opacity-50 rounded px-1 py-0.5 font-medium text-gray-700 inline-flex self-start">
+                                    Salle {session.salle}
+                                </div>
                             )}
                         </div>
                         </div>
