@@ -12,6 +12,7 @@ import AdminMatieresPage from './pages/admin/matieres';
 import AdminSessionsPage from './pages/admin/sessions';
 import PlanningPage from './pages/planning';
 import ProfNotes from './pages/prof/notes';
+import EleveNotes from './pages/eleve/notes';
 
 const AppRoutes = () => {
   return (
@@ -27,6 +28,7 @@ const AppRoutes = () => {
         <Route path="/admin/sessions" element={<ProtectedRoute roles={['admin']}><AdminSessionsPage /></ProtectedRoute>} />
         <Route path="/planning" element={<ProtectedRoute roles={['eleve', 'prof']}><PlanningPage /></ProtectedRoute>} />
         <Route path="/prof/notes" element={<ProtectedRoute roles={['prof']}><ProfNotes /></ProtectedRoute>} />
+        <Route path="/eleve/notes" element={<ProtectedRoute roles={['eleve']}><EleveNotes /></ProtectedRoute>} />
         <Route path="*" element={<ProtectedRoute roles={['eleve', 'admin', 'prof']}><NotFound /></ProtectedRoute>} />
       </Routes>
     </Router>

@@ -50,6 +50,9 @@ CREATE TABLE IF NOT EXISTS notes (
   eleve_id INTEGER,
   matieres_id INTEGER,
   note INTEGER NOT NULL,
+  coefficient INTEGER DEFAULT 1,
+  description VARCHAR(255),
+  date DATE DEFAULT CURRENT_DATE,
   FOREIGN KEY (eleve_id) REFERENCES eleves(id),
   FOREIGN KEY (matieres_id) REFERENCES matieres(id)
 );
@@ -110,9 +113,4 @@ INSERT INTO matieres (id, name, professeur_id, classe_id) VALUES
 INSERT INTO sessions (id, matieres_id, date, start_time, end_time, salle) VALUES 
 (1, 1, '2025-04-23', '08:00:00', '10:00:00', 'H101'),
 (2, 2, '2025-04-23', '10:00:00', '12:00:00', 'H102'),
-(3, 3, '2025-04-23', '14:00:00', '16:00:00', 'H103'),
-(4, 4, '2025-04-23', '08:00:00', '10:00:00', 'H104'),
-(5, 5, '2025-04-23', '10:00:00', '12:00:00', 'H105'),
-(6, 6, '2025-04-23', '14:00:00', '16:00:00', 'H106'),
-(7, 7, '2025-04-23', '08:00:00', '10:00:00', 'H107'),
-(8, 8, '2025-04-23', '10:00:00', '12:00:00', 'H108');
+(3, 3, '2025-04-23', '14:00:00', '16:00:00', 'H103')

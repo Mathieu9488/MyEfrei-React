@@ -30,6 +30,7 @@ export default function NavbarMenus() {
         return [
           "ACCUEIL",
           "PLANNING",
+          "NOTES",
           "SCOLARITÉ",
           "L'ÉCOLE",
           "VIE ÉTUDIANTE",
@@ -73,6 +74,14 @@ export default function NavbarMenus() {
 
   const handleNavigation = (item) => {
     setActive(item);
+    if (item === 'NOTES') {
+      if (auth?.role === 'prof') {
+        navigate('/prof/notes');
+      } else if (auth?.role === 'eleve') {
+        navigate('/eleve/notes');
+      }
+      return; // Sortir de la fonction après la redirection
+    }
     switch (item) {
       case 'ACCUEIL':
         navigate('/portal');
@@ -103,9 +112,6 @@ export default function NavbarMenus() {
         break;
       case 'COURS':
         navigate('/prof/courses');
-        break;
-      case 'NOTES':
-        navigate('/prof/notes');
         break;
       case 'MESSAGES':
         navigate('/prof/messages');
