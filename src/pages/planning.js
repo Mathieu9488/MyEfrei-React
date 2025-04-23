@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'react-feather';
-import Navbar from '../../components/Navbar';
-import NavbarMenus from '../../components/NavbarMenus';
+import Navbar from '../components/Navbar';
+import NavbarMenus from '../components/NavbarMenus';
 
 export default function PlanningPage() {
   const [loading, setLoading] = useState(true);
@@ -39,8 +39,7 @@ export default function PlanningPage() {
         } else {
           throw new Error("Rôle non supporté");
         }
-        
-        console.log(`Fetching from: ${apiRoute}`);
+    
         const response = await fetch(apiRoute);
         
         if (!response.ok) {

@@ -22,10 +22,9 @@ export default function NavbarMenus() {
         ];
       case 'prof':
         return [
+          "ACCUEIL",
           "PLANNING",
-          "COURS",
           "NOTES",
-          "MESSAGES",
         ];
       case 'eleve':
         return [
@@ -54,7 +53,7 @@ export default function NavbarMenus() {
     if (path === '/admin/settings') return 'PARAMÈTRES';
     if (path === '/planning') return 'PLANNING';
     if (path === '/prof/courses') return 'COURS';
-    if (path === '/prof/grades') return 'NOTES';
+    if (path === '/prof/notes') return 'NOTES';
     if (path === '/prof/messages') return 'MESSAGES';
     if (path === '/eleve/school') return 'SCOLARITÉ';
     if (path === '/eleve/school-info') return 'L\'ÉCOLE';
@@ -106,7 +105,7 @@ export default function NavbarMenus() {
         navigate('/prof/courses');
         break;
       case 'NOTES':
-        navigate('/prof/grades');
+        navigate('/prof/notes');
         break;
       case 'MESSAGES':
         navigate('/prof/messages');

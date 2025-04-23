@@ -10,7 +10,8 @@ import AdminClassesPage from './pages/admin/classes';
 import AdminProfesseursPage from './pages/admin/professeurs';
 import AdminMatieresPage from './pages/admin/matieres';
 import AdminSessionsPage from './pages/admin/sessions';
-import PlanningPage from './pages/eleve/planning';
+import PlanningPage from './pages/planning';
+import ProfNotes from './pages/prof/notes';
 
 const AppRoutes = () => {
   return (
@@ -25,6 +26,7 @@ const AppRoutes = () => {
         <Route path="/admin/matieres" element={<ProtectedRoute roles={['admin']}><AdminMatieresPage /></ProtectedRoute>} />
         <Route path="/admin/sessions" element={<ProtectedRoute roles={['admin']}><AdminSessionsPage /></ProtectedRoute>} />
         <Route path="/planning" element={<ProtectedRoute roles={['eleve', 'prof']}><PlanningPage /></ProtectedRoute>} />
+        <Route path="/prof/notes" element={<ProtectedRoute roles={['prof']}><ProfNotes /></ProtectedRoute>} />
         <Route path="*" element={<ProtectedRoute roles={['eleve', 'admin', 'prof']}><NotFound /></ProtectedRoute>} />
       </Routes>
     </Router>
