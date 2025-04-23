@@ -1,12 +1,9 @@
-// backend/db.js
 const { Pool } = require('pg');
 
+const connectionString = process.env.REACT_APP_DB_URL;
+
 const pool = new Pool({
-  user: 'your_user',
-  host: 'localhost',
-  database: 'your_database',
-  password: 'your_password',
-  port: 5432,
+  connectionString,
 });
 
 module.exports = pool;
