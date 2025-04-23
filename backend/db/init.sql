@@ -73,7 +73,7 @@ INSERT INTO classes (id, name) VALUES (1, 'X-IN-BAC-1'), (2, 'X-IN-BAC-2'), (3, 
 
 -- Ajout des élèves
 INSERT INTO eleves (id, name, firstname, classe_id, password) VALUES 
-(20210001, 'BESNARD', 'Clément', 1, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'), -- password: eleve
+(20221112, 'BESNARD', 'Clément', 1, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'), -- password: eleve
 (20210002, 'DIAW', 'Abdoul', 1, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
 (20210003, 'POISSONNEAU', 'Alexandre', 1, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
 (20210004, 'QUENTREC', 'Alice', 2, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
@@ -83,7 +83,7 @@ INSERT INTO eleves (id, name, firstname, classe_id, password) VALUES
 (20210008, 'LARIBI', 'Koussaï', 3, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
 (20210009, 'COTELLON', 'Loane', 3, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
 (20210010, 'RANDRIAMAHEFA', 'Maharo', 4, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
-(20210011, 'CRESPIN', 'Mathieu', 4, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
+(20220990, 'CRESPIN', 'Mathieu', 4, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
 (20210012, 'AMOKRANE', 'Sami', 4, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
 (20210013, 'POINAMA', 'Samuel', 5, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
 (20210014, 'AKOURI', 'Sarah', 5, '$2b$10$02adDM4hkinU35DWliAmju0i.76TPzBb4ndxCJOQzLeLRX.hfWURe'),
