@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash, Pencil, Filter, Search, X } from "lucide-react";
+import { Plus, Trash, Pencil, Filter, Search, X, ArrowDown, ArrowUp } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import NavbarMenus from "../../components/NavbarMenus";
 
@@ -20,6 +20,7 @@ export default function AdminElevesPage() {
     firstname: "",
     classe_id: []
   });
+  const [sortConfig, setSortConfig] = useState({ key: 'id', direction: 'ascending' });
   const itemsPerPage = 30;
 
   useEffect(() => {
@@ -37,6 +38,24 @@ export default function AdminElevesPage() {
     const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/admin/classes`);
     const data = await response.json();
     setClasses(data);
+  };
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+    setCurrentPage(1);
+  };
+
+  const getSortIcon = (columnName) => {
+    if (sortConfig.key === columnName) {
+      return sortConfig.direction === 'ascending' 
+        ? <ArrowUp size={14} className="text-blue-600" />
+        : <ArrowDown size={14} className="text-blue-600" />;
+    }
+    return null;
   };
 
   const addEleve = async () => {
@@ -177,8 +196,26 @@ export default function AdminElevesPage() {
     return true;
   });
 
-  const totalPages = Math.ceil(filteredEleves.length / itemsPerPage);
-  const displayedEleves = filteredEleves.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const sortedEleves = [...filteredEleves].sort((a, b) => {
+    if (sortConfig.key === 'id') {
+      return sortConfig.direction === 'ascending' 
+        ? a.id - b.id 
+        : b.id - a.id;
+    } else if (sortConfig.key === 'classe_id') {
+      const classNameA = classes.find(c => c.id === a.classe_id)?.name || '';
+      const classNameB = classes.find(c => c.id === b.classe_id)?.name || '';
+      return sortConfig.direction === 'ascending'
+        ? classNameA.localeCompare(classNameB)
+        : classNameB.localeCompare(classNameA);
+    } else {
+      return sortConfig.direction === 'ascending'
+        ? String(a[sortConfig.key]).localeCompare(String(b[sortConfig.key]))
+        : String(b[sortConfig.key]).localeCompare(String(a[sortConfig.key]));
+    }
+  });
+
+  const totalPages = Math.ceil(sortedEleves.length / itemsPerPage);
+  const displayedEleves = sortedEleves.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
@@ -272,7 +309,12 @@ export default function AdminElevesPage() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <div className="flex items-center gap-2">
-                      ID
+                      <button 
+                        onClick={() => requestSort('id')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        ID {getSortIcon('id')}
+                      </button>
                       <button 
                         onClick={() => toggleFilterColumn('id')}
                         className={`p-1 rounded transition-colors ${activeSearchColumn === 'id' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
@@ -283,7 +325,12 @@ export default function AdminElevesPage() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <div className="flex items-center gap-2">
-                      Nom
+                      <button 
+                        onClick={() => requestSort('name')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        Nom {getSortIcon('name')}
+                      </button>
                       <button 
                         onClick={() => toggleFilterColumn('name')}
                         className={`p-1 rounded transition-colors ${activeSearchColumn === 'name' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
@@ -294,7 +341,12 @@ export default function AdminElevesPage() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <div className="flex items-center gap-2">
-                      Prénom
+                      <button 
+                        onClick={() => requestSort('firstname')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        Prénom {getSortIcon('firstname')}
+                      </button>
                       <button 
                         onClick={() => toggleFilterColumn('firstname')}
                         className={`p-1 rounded transition-colors ${activeSearchColumn === 'firstname' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
@@ -305,7 +357,12 @@ export default function AdminElevesPage() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <div className="flex items-center gap-2">
-                      Classe
+                      <button 
+                        onClick={() => requestSort('classe_id')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        Classe {getSortIcon('classe_id')}
+                      </button>
                       <button 
                         onClick={() => toggleFilterColumn('classe_id')}
                         className={`p-1 rounded transition-colors ${activeSearchColumn === 'classe_id' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
@@ -362,7 +419,7 @@ export default function AdminElevesPage() {
           
           <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
             <p className="text-sm text-gray-500">
-              Affichage de {displayedEleves.length > 0 ? `${(currentPage - 1) * itemsPerPage + 1} - ${Math.min(currentPage * itemsPerPage, filteredEleves.length)}` : "0"} sur {filteredEleves.length} élèves
+              Affichage de {displayedEleves.length > 0 ? `${(currentPage - 1) * itemsPerPage + 1} - ${Math.min(currentPage * itemsPerPage, sortedEleves.length)}` : "0"} sur {sortedEleves.length} élèves
             </p>
             <div className="flex space-x-2">
               <button
