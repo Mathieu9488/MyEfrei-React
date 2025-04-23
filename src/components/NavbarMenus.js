@@ -52,7 +52,7 @@ export default function NavbarMenus() {
     if (path === '/admin/sessions') return 'GESTION DES SESSIONS';
     if (path === '/admin/reports') return 'RAPPORTS';
     if (path === '/admin/settings') return 'PARAMÈTRES';
-    if (path === '/prof/planning') return 'PLANNING';
+    if (path === '/planning') return 'PLANNING';
     if (path === '/prof/courses') return 'COURS';
     if (path === '/prof/grades') return 'NOTES';
     if (path === '/prof/messages') return 'MESSAGES';
@@ -100,7 +100,7 @@ export default function NavbarMenus() {
         navigate('/admin/settings');
         break;
       case 'PLANNING':
-        navigate('/prof/planning');
+        navigate('/planning');
         break;
       case 'COURS':
         navigate('/prof/courses');
