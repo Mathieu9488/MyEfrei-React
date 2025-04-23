@@ -1,55 +1,56 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash, Pencil, ChevronUp, ChevronDown, Calendar, Clock } from "lucide-react";
+import { Plus, Trash, Pencil, Filter, Search, X, ArrowDown, ArrowUp, Calendar, Clock } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import NavbarMenus from "../../components/NavbarMenus";
 
 export default function AdminSessionsPage() {
-    const [sessions, setSessions] = useState([]);
-    const [matieres, setMatieres] = useState([]);
-    const [search, setSearch] = useState("");
-    const [newSession, setNewSession] = useState({ 
-        matieres_id: "", 
-        date: "", 
-        start_time: "",
-        end_time: "", 
-        salle: "" 
-    });
-    const [editingSession, setEditingSession] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [sortColumn, setSortColumn] = useState(null);
-    const [sortOrder, setSortOrder] = useState("asc");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [error, setError] = useState("");
-    const itemsPerPage = 10;
-    const [searchMatiere, setSearchMatiere] = useState("");
-    const [selectedMatiereName, setSelectedMatiereName] = useState("");
-    const [showMatieresList, setShowMatieresList] = useState(false);
-    const [filterClasse, setFilterClasse] = useState("");
-    const [filterProf, setFilterProf] = useState("");
-
-    const filterMatieresResults = () => {
-    return matieres.filter(matiere => {
-        const matchSearch = matiere.name.toLowerCase().includes(searchMatiere.toLowerCase());
-        const matchClasse = !filterClasse || (matiere.classe_name === filterClasse);
-        const matchProf = !filterProf || (matiere.professeur_name && `${matiere.professeur_name} ${matiere.professeur_firstname}` === filterProf);
-        return matchSearch && matchClasse && matchProf;
-    });
-    };
-
-    useEffect(() => {
-    if (isEditing && editingSession.matieres_id) {
-        const selectedMatiere = matieres.find(m => m.id === parseInt(editingSession.matieres_id));
-        if (selectedMatiere) {
-        setSelectedMatiereName(`${selectedMatiere.name} - ${selectedMatiere.classe_name || "Sans classe"} (${selectedMatiere.professeur_name ? `${selectedMatiere.professeur_name} ${selectedMatiere.professeur_firstname}` : "Sans professeur"})`);
-        }
-    }
-    }, [isEditing, editingSession, matieres]);
+  const [sessions, setSessions] = useState([]);
+  const [matieres, setMatieres] = useState([]);
+  const [search, setSearch] = useState("");
+  const [activeSearchColumn, setActiveSearchColumn] = useState("all");
+  const [newSession, setNewSession] = useState({ 
+    matieres_id: "", 
+    date: "", 
+    start_time: "",
+    end_time: "", 
+    salle: "" 
+  });
+  const [editingSession, setEditingSession] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [error, setError] = useState("");
+  const [activeFilters, setActiveFilters] = useState({});
+  const [filterValues, setFilterValues] = useState({
+    id: "",
+    matiere: "",
+    professeur: "",
+    classe: "",
+    date: "",
+    horaire: "",
+    salle: ""
+  });
+  const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'ascending' });
+  const itemsPerPage = 30;
+  const [searchMatiere, setSearchMatiere] = useState("");
+  const [selectedMatiereName, setSelectedMatiereName] = useState("");
+  const [showMatieresList, setShowMatieresList] = useState(false);
+  const [filterClasse, setFilterClasse] = useState("");
+  const [filterProf, setFilterProf] = useState("");
 
   useEffect(() => {
     fetchSessions();
     fetchMatieres();
   }, []);
+
+  useEffect(() => {
+    if (isEditing && editingSession?.matieres_id) {
+      const selectedMatiere = matieres.find(m => m.id === parseInt(editingSession.matieres_id));
+      if (selectedMatiere) {
+        setSelectedMatiereName(`${selectedMatiere.name} - ${selectedMatiere.classe_name || "Sans classe"} (${selectedMatiere.professeur_name ? `${selectedMatiere.professeur_name} ${selectedMatiere.professeur_firstname}` : "Sans professeur"})`);
+      }
+    }
+  }, [isEditing, editingSession, matieres]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -84,6 +85,33 @@ export default function AdminSessionsPage() {
     }
   };
 
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+    setCurrentPage(1);
+  };
+
+  const getSortIcon = (columnName) => {
+    if (sortConfig.key === columnName) {
+      return sortConfig.direction === 'ascending' 
+        ? <ArrowUp size={14} className="text-blue-600" />
+        : <ArrowDown size={14} className="text-blue-600" />;
+    }
+    return null;
+  };
+
+  const filterMatieresResults = () => {
+    return matieres.filter(matiere => {
+      const matchSearch = matiere.name.toLowerCase().includes(searchMatiere.toLowerCase());
+      const matchClasse = !filterClasse || (matiere.classe_name === filterClasse);
+      const matchProf = !filterProf || (matiere.professeur_name && `${matiere.professeur_name} ${matiere.professeur_firstname}` === filterProf);
+      return matchSearch && matchClasse && matchProf;
+    });
+  };
+
   const addSession = async () => {
     if (!newSession.matieres_id || !newSession.date || !newSession.start_time || !newSession.end_time) {
       setError("Veuillez remplir tous les champs obligatoires");
@@ -108,6 +136,7 @@ export default function AdminSessionsPage() {
         setNewSession({ matieres_id: "", date: "", start_time: "", end_time: "", salle: "" });
         setIsModalOpen(false);
         setError("");
+        setSelectedMatiereName("");
       }
     } catch (error) {
       console.error("Erreur lors de l'ajout de la session:", error);
@@ -150,6 +179,7 @@ export default function AdminSessionsPage() {
         setEditingSession(null);
         setIsModalOpen(false);
         setError("");
+        setSelectedMatiereName("");
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour de la session:", error);
@@ -162,6 +192,7 @@ export default function AdminSessionsPage() {
     setIsEditing(false);
     setIsModalOpen(true);
     setError("");
+    setSelectedMatiereName("");
   };
 
   const openEditModal = (session) => {
@@ -184,10 +215,24 @@ export default function AdminSessionsPage() {
     setError("");
   };
 
-  const handleSort = (column) => {
-    const order = sortColumn === column && sortOrder === "asc" ? "desc" : "asc";
-    setSortColumn(column);
-    setSortOrder(order);
+  const toggleFilterColumn = (column) => {
+    if (activeSearchColumn === column) {
+      setActiveSearchColumn("all");
+    } else {
+      setActiveSearchColumn(column);
+      document.querySelector('input[type="text"][placeholder*="Rechercher"]').focus();
+    }
+  };
+
+  const clearFilter = (column) => {
+    setFilterValues({
+      ...filterValues,
+      [column]: ""
+    });
+    
+    const updatedActiveFilters = { ...activeFilters };
+    delete updatedActiveFilters[column];
+    setActiveFilters(updatedActiveFilters);
   };
 
   const formatDate = (dateString) => {
@@ -203,239 +248,449 @@ export default function AdminSessionsPage() {
     return timeString.substring(0, 5);
   };
 
-  const getSortedSessions = () => {
-    if (!sortColumn) return [...sessions];
-    
-    return [...sessions].sort((a, b) => {
-      let aValue, bValue;
-      
-      switch(sortColumn) {
-        case "matiere":
-          aValue = a.matiere_name;
-          bValue = b.matiere_name;
-          break;
-        case "professeur":
-          aValue = `${a.professeur_name || ""} ${a.professeur_firstname || ""}`;
-          bValue = `${b.professeur_name || ""} ${b.professeur_firstname || ""}`;
-          break;
-        case "classe":
-          aValue = a.classe_name;
-          bValue = b.classe_name;
-          break;
-        case "date":
-          aValue = new Date(a.date);
-          bValue = new Date(b.date);
-          break;
-        case "start_time":
-          aValue = a.start_time;
-          bValue = b.start_time;
-          break;
-        case "salle":
-          aValue = a.salle || "";
-          bValue = b.salle || "";
-          break;
-        default:
-          aValue = a[sortColumn];
-          bValue = b[sortColumn];
+  const filteredSessions = sessions.filter((session) => {
+    if (!search) {
+      if (Object.keys(activeFilters).length === 0) return true;
+    } else if (activeSearchColumn === "all") {
+      if (
+        !(session.matiere_name && session.matiere_name.toLowerCase().includes(search.toLowerCase())) &&
+        !(session.professeur_name && `${session.professeur_name} ${session.professeur_firstname}`.toLowerCase().includes(search.toLowerCase())) &&
+        !(session.classe_name && session.classe_name.toLowerCase().includes(search.toLowerCase())) &&
+        !(session.salle && session.salle.toLowerCase().includes(search.toLowerCase())) &&
+        !formatDate(session.date).toLowerCase().includes(search.toLowerCase()) &&
+        !`${formatTime(session.start_time)} - ${formatTime(session.end_time)}`.toLowerCase().includes(search.toLowerCase())
+      ) {
+        return false;
       }
-      
-      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-      return 0;
-    });
-  };
+    } else if (activeSearchColumn === "id") {
+      if (!String(session.id).toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
+    } else if (activeSearchColumn === "matiere") {
+      if (!session.matiere_name || !session.matiere_name.toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
+    } else if (activeSearchColumn === "professeur") {
+      const profName = session.professeur_name && session.professeur_firstname ? 
+        `${session.professeur_name} ${session.professeur_firstname}` : "";
+      if (!profName.toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
+    } else if (activeSearchColumn === "classe") {
+      if (!session.classe_name || !session.classe_name.toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
+    } else if (activeSearchColumn === "date") {
+      if (!formatDate(session.date).toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
+    } else if (activeSearchColumn === "horaire") {
+      const horaire = `${formatTime(session.start_time)} - ${formatTime(session.end_time)}`;
+      if (!horaire.toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
+    } else if (activeSearchColumn === "salle") {
+      if (!session.salle || !session.salle.toLowerCase().includes(search.toLowerCase())) {
+        return false;
+      }
+    }
 
-  const filteredSessions = getSortedSessions().filter((session) => {
-    const searchLower = search.toLowerCase();
-    return (
-      (session.matiere_name && session.matiere_name.toLowerCase().includes(searchLower)) ||
-      (session.professeur_name && `${session.professeur_name} ${session.professeur_firstname}`.toLowerCase().includes(searchLower)) ||
-      (session.classe_name && session.classe_name.toLowerCase().includes(searchLower)) ||
-      (session.salle && session.salle.toLowerCase().includes(searchLower)) ||
-      formatDate(session.date).toLowerCase().includes(searchLower)
-    );
+    // Appliquer les filtres actifs
+    if (activeFilters.id && filterValues.id && 
+        !String(session.id).toLowerCase().includes(filterValues.id.toLowerCase())) {
+      return false;
+    }
+
+    if (activeFilters.matiere && filterValues.matiere && 
+        (!session.matiere_name || !session.matiere_name.toLowerCase().includes(filterValues.matiere.toLowerCase()))) {
+      return false;
+    }
+
+    if (activeFilters.professeur && filterValues.professeur) {
+      const profName = session.professeur_name && session.professeur_firstname ? 
+        `${session.professeur_name} ${session.professeur_firstname}` : "";
+      if (!profName.toLowerCase().includes(filterValues.professeur.toLowerCase())) {
+        return false;
+      }
+    }
+
+    if (activeFilters.classe && filterValues.classe && 
+        (!session.classe_name || !session.classe_name.toLowerCase().includes(filterValues.classe.toLowerCase()))) {
+      return false;
+    }
+
+    if (activeFilters.date && filterValues.date && 
+        !formatDate(session.date).toLowerCase().includes(filterValues.date.toLowerCase())) {
+      return false;
+    }
+
+    if (activeFilters.horaire && filterValues.horaire) {
+      const horaire = `${formatTime(session.start_time)} - ${formatTime(session.end_time)}`;
+      if (!horaire.toLowerCase().includes(filterValues.horaire.toLowerCase())) {
+        return false;
+      }
+    }
+
+    if (activeFilters.salle && filterValues.salle && 
+        (!session.salle || !session.salle.toLowerCase().includes(filterValues.salle.toLowerCase()))) {
+      return false;
+    }
+
+    return true;
   });
 
-  const totalPages = Math.ceil(filteredSessions.length / itemsPerPage);
-  const displayedSessions = filteredSessions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const sortedSessions = [...filteredSessions].sort((a, b) => {
+    if (sortConfig.key === 'id') {
+      return sortConfig.direction === 'ascending' 
+        ? a.id - b.id 
+        : b.id - a.id;
+    } else if (sortConfig.key === 'date') {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return sortConfig.direction === 'ascending' 
+        ? dateA - dateB 
+        : dateB - dateA;
+    } else if (sortConfig.key === 'horaire' || sortConfig.key === 'start_time') {
+      return sortConfig.direction === 'ascending'
+        ? a.start_time.localeCompare(b.start_time)
+        : b.start_time.localeCompare(a.start_time);
+    } else if (sortConfig.key === 'matiere') {
+      const nameA = a.matiere_name || "";
+      const nameB = b.matiere_name || "";
+      return sortConfig.direction === 'ascending'
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA);
+    } else if (sortConfig.key === 'professeur') {
+      const profNameA = a.professeur_name ? `${a.professeur_name} ${a.professeur_firstname}` : "";
+      const profNameB = b.professeur_name ? `${b.professeur_name} ${b.professeur_firstname}` : "";
+      return sortConfig.direction === 'ascending'
+        ? profNameA.localeCompare(profNameB)
+        : profNameB.localeCompare(profNameA);
+    } else if (sortConfig.key === 'classe') {
+      const classeNameA = a.classe_name || "";
+      const classeNameB = b.classe_name || "";
+      return sortConfig.direction === 'ascending'
+        ? classeNameA.localeCompare(classeNameB)
+        : classeNameB.localeCompare(classeNameA);
+    } else {
+      const valueA = a[sortConfig.key] || "";
+      const valueB = b[sortConfig.key] || "";
+      return sortConfig.direction === 'ascending'
+        ? String(valueA).localeCompare(String(valueB))
+        : String(valueB).localeCompare(String(valueA));
+    }
+  });
+
+  const totalPages = Math.ceil(sortedSessions.length / itemsPerPage);
+  const displayedSessions = sortedSessions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="w-full h-screen relative">
+    <div className="w-full min-h-screen bg-gray-50">
       <Navbar />
       <NavbarMenus />
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-xl font-bold">Gestion des sessions</h1>
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-semibold text-[#0a2463]">Gestion des sessions</h1>
+        </div>
+        
+        <div className="flex justify-end mb-4">
           <button
             onClick={openCreateModal}
-            className="p-2 text-white rounded flex items-center"
-            style={{ backgroundColor: "rgb(23, 82, 168)" }}
+            className="bg-[#0d47a1] hover:bg-[#0a3880] text-white rounded flex items-center px-4 py-2 transition-colors"
           >
-            <Plus size={16} className="mr-2" /> Nouvelle session
+            <Plus size={18} className="mr-2" /> Nouvelle session
           </button>
         </div>
-        <div className="flex justify-center mb-4 pb-4">
-          <input
-            type="text"
-            placeholder="Rechercher une session..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="p-2 border border-gray-300 rounded w-1/2"
-          />
-        </div>
-
-        <div className="flex justify-center">
-          <table className="bg-white max-w-6xl w-full mx-auto text-center">
-            <thead>
-              <tr>
-                <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("id")}>
-                  <div className="flex items-center justify-center">
-                    ID
-                    <button className="ml-2 p-1 rounded-full border border-gray-300 w-6 h-6 flex items-center justify-center">
-                      {sortColumn === "id" ? (
-                        sortOrder === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />
-                      ) : (
-                        <span className="block w-3 h-0.5 bg-gray-500"></span>
-                      )}
-                    </button>
-                  </div>
-                </th>
-                <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("matiere")}>
-                  <div className="flex items-center justify-center">
-                    Matière
-                    <button className="ml-2 p-1 rounded-full border border-gray-300 w-6 h-6 flex items-center justify-center">
-                      {sortColumn === "matiere" ? (
-                        sortOrder === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />
-                      ) : (
-                        <span className="block w-3 h-0.5 bg-gray-500"></span>
-                      )}
-                    </button>
-                  </div>
-                </th>
-                <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("professeur")}>
-                  <div className="flex items-center justify-center">
-                    Professeur
-                    <button className="ml-2 p-1 rounded-full border border-gray-300 w-6 h-6 flex items-center justify-center">
-                      {sortColumn === "professeur" ? (
-                        sortOrder === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />
-                      ) : (
-                        <span className="block w-3 h-0.5 bg-gray-500"></span>
-                      )}
-                    </button>
-                  </div>
-                </th>
-                <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("classe")}>
-                  <div className="flex items-center justify-center">
-                    Classe
-                    <button className="ml-2 p-1 rounded-full border border-gray-300 w-6 h-6 flex items-center justify-center">
-                      {sortColumn === "classe" ? (
-                        sortOrder === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />
-                      ) : (
-                        <span className="block w-3 h-0.5 bg-gray-500"></span>
-                      )}
-                    </button>
-                  </div>
-                </th>
-                <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("date")}>
-                  <div className="flex items-center justify-center">
-                    Date
-                    <button className="ml-2 p-1 rounded-full border border-gray-300 w-6 h-6 flex items-center justify-center">
-                      {sortColumn === "date" ? (
-                        sortOrder === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />
-                      ) : (
-                        <span className="block w-3 h-0.5 bg-gray-500"></span>
-                      )}
-                    </button>
-                  </div>
-                </th>
-                <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("start_time")}>
-                  <div className="flex items-center justify-center">
-                    Horaires
-                    <button className="ml-2 p-1 rounded-full border border-gray-300 w-6 h-6 flex items-center justify-center">
-                      {sortColumn === "start_time" ? (
-                        sortOrder === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />
-                      ) : (
-                        <span className="block w-3 h-0.5 bg-gray-500"></span>
-                      )}
-                    </button>
-                  </div>
-                </th>
-                <th className="py-2 px-4 border cursor-pointer" onClick={() => handleSort("salle")}>
-                  <div className="flex items-center justify-center">
-                    Salle
-                    <button className="ml-2 p-1 rounded-full border border-gray-300 w-6 h-6 flex items-center justify-center">
-                      {sortColumn === "salle" ? (
-                        sortOrder === "asc" ? <ChevronUp size={16} /> : <ChevronDown size={16} />
-                      ) : (
-                        <span className="block w-3 h-0.5 bg-gray-500"></span>
-                      )}
-                    </button>
-                  </div>
-                </th>
-                <th className="py-2 px-4 border">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedSessions.map((session) => (
-                <tr key={session.id}>
-                  <td className="py-2 px-4 border">{session.id}</td>
-                  <td className="py-2 px-4 border">{session.matiere_name}</td>
-                  <td className="py-2 px-4 border">
-                    {session.professeur_name ? 
-                        `${session.professeur_name} ${session.professeur_firstname}` : 
-                        "Non assigné"
-                    }
-                    </td>
-                  <td className="py-2 px-4 border">{session.classe_name || "Non assignée"}</td>
-                  <td className="py-2 px-4 border">{formatDate(session.date)}</td>
-                  <td className="py-2 px-4 border">
-                    {formatTime(session.start_time)} - {formatTime(session.end_time)}
-                  </td>
-                  <td className="py-2 px-4 border">{session.salle || "Non assignée"}</td>
-                  <td className="py-2 px-4 border text-center whitespace-nowrap">
-                    <button
-                      className="ml-2 p-2 border border-gray-300 rounded"
-                      onClick={() => openEditModal(session)}
+        
+        <div className="bg-white rounded-md shadow-sm border border-gray-200 mb-6">
+          <div className="p-6 pb-4">
+            <div className="relative mx-auto max-w-lg mb-4">
+              <input
+                type="text"
+                placeholder={`Rechercher ${
+                  activeSearchColumn === "id" ? "par ID..." : 
+                  activeSearchColumn === "matiere" ? "par matière..." :
+                  activeSearchColumn === "professeur" ? "par professeur..." :
+                  activeSearchColumn === "classe" ? "par classe..." :
+                  activeSearchColumn === "date" ? "par date..." :
+                  activeSearchColumn === "horaire" ? "par horaires..." :
+                  activeSearchColumn === "salle" ? "par salle..." :
+                  "une session..."
+                }`}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                {activeSearchColumn !== "all" && (
+                  <span className="mr-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    {activeSearchColumn === "id" ? "ID" :
+                     activeSearchColumn === "matiere" ? "Matière" :
+                     activeSearchColumn === "professeur" ? "Professeur" :
+                     activeSearchColumn === "classe" ? "Classe" :
+                     activeSearchColumn === "date" ? "Date" :
+                     activeSearchColumn === "horaire" ? "Horaires" :
+                     activeSearchColumn === "salle" ? "Salle" : ""}
+                  </span>
+                )}
+                <Search size={18} className="text-gray-400" />
+              </div>
+            </div>
+          
+            {Object.keys(activeFilters).length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {Object.keys(activeFilters).map(column => (
+                  <span 
+                    key={column}
+                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
+                  >
+                    {column === 'id' ? 'ID' : 
+                    column === 'matiere' ? 'Matière' :
+                    column === 'professeur' ? 'Professeur' :
+                    column === 'classe' ? 'Classe' :
+                    column === 'date' ? 'Date' :
+                    column === 'horaire' ? 'Horaires' :
+                    'Salle'}: {filterValues[column]}
+                    <button 
+                      onClick={() => clearFilter(column)} 
+                      className="ml-1 text-blue-600 hover:text-blue-800"
                     >
-                      <Pencil size={16} />
+                      <X size={12} />
                     </button>
-                    <button
-                      className="ml-2 p-2 border border-red-500 text-red-500 rounded"
-                      onClick={() => deleteSession(session.id)}
-                    >
-                      <Trash size={16} />
-                    </button>
-                  </td>
+                  </span>
+                ))}
+                <button 
+                  onClick={() => {
+                    setActiveFilters({});
+                    setFilterValues({
+                      id: "",
+                      matiere: "",
+                      professeur: "",
+                      classe: "",
+                      date: "",
+                      horaire: "",
+                      salle: ""
+                    });
+                  }}
+                  className="px-2 py-1 text-xs font-medium text-red-600 hover:text-red-800 hover:underline"
+                >
+                  Effacer tous les filtres
+                </button>
+              </div>
+            )}
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-gray-50 border-y border-gray-200">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => requestSort('id')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        ID {getSortIcon('id')}
+                      </button>
+                      <button 
+                        onClick={() => toggleFilterColumn('id')}
+                        className={`p-1 rounded transition-colors ${activeSearchColumn === 'id' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
+                      >
+                        <Filter size={14} />
+                      </button>
+                    </div>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => requestSort('matiere')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        Matière {getSortIcon('matiere')}
+                      </button>
+                      <button 
+                        onClick={() => toggleFilterColumn('matiere')}
+                        className={`p-1 rounded transition-colors ${activeSearchColumn === 'matiere' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
+                      >
+                        <Filter size={14} />
+                      </button>
+                    </div>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => requestSort('professeur')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        Professeur {getSortIcon('professeur')}
+                      </button>
+                      <button 
+                        onClick={() => toggleFilterColumn('professeur')}
+                        className={`p-1 rounded transition-colors ${activeSearchColumn === 'professeur' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
+                      >
+                        <Filter size={14} />
+                      </button>
+                    </div>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => requestSort('classe')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        Classe {getSortIcon('classe')}
+                      </button>
+                      <button 
+                        onClick={() => toggleFilterColumn('classe')}
+                        className={`p-1 rounded transition-colors ${activeSearchColumn === 'classe' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
+                      >
+                        <Filter size={14} />
+                      </button>
+                    </div>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => requestSort('date')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        Date {getSortIcon('date')}
+                      </button>
+                      <button 
+                        onClick={() => toggleFilterColumn('date')}
+                        className={`p-1 rounded transition-colors ${activeSearchColumn === 'date' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
+                      >
+                        <Filter size={14} />
+                      </button>
+                    </div>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => requestSort('start_time')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        Horaires {getSortIcon('start_time')}
+                      </button>
+                      <button 
+                        onClick={() => toggleFilterColumn('horaire')}
+                        className={`p-1 rounded transition-colors ${activeSearchColumn === 'horaire' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
+                      >
+                        <Filter size={14} />
+                      </button>
+                    </div>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => requestSort('salle')}
+                        className="flex items-center hover:text-gray-700"
+                      >
+                        Salle {getSortIcon('salle')}
+                      </button>
+                      <button 
+                        onClick={() => toggleFilterColumn('salle')}
+                        className={`p-1 rounded transition-colors ${activeSearchColumn === 'salle' ? 'text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
+                      >
+                        <Filter size={14} />
+                      </button>
+                    </div>
+                  </th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="p-2 mx-1 bg-gray-300 rounded disabled:opacity-50"
-          >
-            Précédent
-          </button>
-          <button
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages || totalPages === 0}
-            className="p-2 mx-1 bg-gray-300 rounded disabled:opacity-50"
-          >
-            Suivant
-          </button>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {displayedSessions.length > 0 ? (
+                  displayedSessions.map((session) => (
+                    <tr key={session.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-4 text-sm text-gray-900">{session.id}</td>
+                      <td className="px-4 py-4">
+                        <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700">
+                          {session.matiere_name}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4">
+                        {session.professeur_name ? 
+                          <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-green-50 text-green-700">
+                            {`${session.professeur_name} ${session.professeur_firstname}`}
+                          </span> : 
+                          <span className="text-sm text-gray-500">Non assigné</span>
+                        }
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-purple-50 text-purple-700">
+                          {session.classe_name || "Non assignée"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-900">
+                        {formatDate(session.date)}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-900">
+                        {formatTime(session.start_time)} - {formatTime(session.end_time)}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-900">
+                        {session.salle || 
+                          <span className="text-gray-500 italic">Non assignée</span>
+                        }
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <div className="flex justify-center space-x-2">
+                          <button 
+                            className="text-blue-600 hover:text-blue-800" 
+                            onClick={() => openEditModal(session)}
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button 
+                            className="text-red-600 hover:text-red-800" 
+                            onClick={() => deleteSession(session.id)}
+                          >
+                            <Trash size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="8" className="px-6 py-8 text-center text-sm text-gray-500">
+                      Aucune session ne correspond à votre recherche
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+            <p className="text-sm text-gray-500">
+              Affichage de {displayedSessions.length > 0 ? `${(currentPage - 1) * itemsPerPage + 1} - ${Math.min(currentPage * itemsPerPage, sortedSessions.length)}` : "0"} sur {sortedSessions.length} sessions
+            </p>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 text-sm rounded ${currentPage === 1 ? 'text-gray-400 bg-gray-100' : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'}`}
+              >
+                Précédent
+              </button>
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages || totalPages === 0}
+                className={`px-4 py-2 text-sm rounded ${currentPage === totalPages || totalPages === 0 ? 'text-gray-400 bg-gray-100' : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'}`}
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
         </div>
 
         {isModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded shadow-lg w-1/3">
-              <h2 className="text-xl font-bold mb-4">
+            <div className="bg-white p-6 rounded shadow-xl w-full max-w-lg">
+              <h2 className="text-xl font-semibold text-gray-800 mb-5">
                 {isEditing ? "Modifier une session" : "Ajouter une session"}
               </h2>
               
@@ -445,167 +700,169 @@ export default function AdminSessionsPage() {
                 </div>
               )}
               
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-1">Matière *</label>
-                <div className="relative matieres-selector">
+              <div className="space-y-4">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Matière *</label>
+                  <div className="relative matieres-selector">
                     <input
-                    type="text"
-                    placeholder="Rechercher une matière..."
-                    value={searchMatiere}
-                    onChange={(e) => setSearchMatiere(e.target.value)}
-                    className="p-2 border border-gray-300 rounded w-full"
-                    onFocus={() => setShowMatieresList(true)}
+                      type="text"
+                      placeholder="Rechercher une matière..."
+                      value={searchMatiere}
+                      onChange={(e) => setSearchMatiere(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      onFocus={() => setShowMatieresList(true)}
                     />
                     {showMatieresList && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded max-h-60 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded max-h-60 overflow-y-auto shadow-lg">
                         <div className="sticky top-0 bg-gray-100 p-2">
-                        <div className="flex gap-2 mb-2">
+                          <div className="flex gap-2 mb-2">
                             <select 
-                            className="p-1 border border-gray-300 rounded text-sm flex-1"
-                            onChange={(e) => setFilterClasse(e.target.value)}
-                            value={filterClasse}
+                              className="p-1 border border-gray-300 rounded text-sm flex-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              onChange={(e) => setFilterClasse(e.target.value)}
+                              value={filterClasse}
                             >
-                            <option value="">Toutes les classes</option>
-                            {[...new Set(matieres.map(m => m.classe_name))].filter(Boolean).map(classeName => (
+                              <option value="">Toutes les classes</option>
+                              {[...new Set(matieres.map(m => m.classe_name))].filter(Boolean).map(classeName => (
                                 <option key={classeName} value={classeName}>{classeName}</option>
-                            ))}
+                              ))}
                             </select>
                             <select 
-                            className="p-1 border border-gray-300 rounded text-sm flex-1"
-                            onChange={(e) => setFilterProf(e.target.value)}
-                            value={filterProf}
+                              className="p-1 border border-gray-300 rounded text-sm flex-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              onChange={(e) => setFilterProf(e.target.value)}
+                              value={filterProf}
                             >
-                            <option value="">Tous les professeurs</option>
-                            {[...new Set(matieres.map(m => m.professeur_id ? `${m.professeur_name} ${m.professeur_firstname}` : null))].filter(Boolean).map(profName => (
+                              <option value="">Tous les professeurs</option>
+                              {[...new Set(matieres.map(m => m.professeur_id ? `${m.professeur_name} ${m.professeur_firstname}` : null))].filter(Boolean).map(profName => (
                                 <option key={profName} value={profName}>{profName}</option>
-                            ))}
+                              ))}
                             </select>
-                        </div>
+                          </div>
                         </div>
                         {filterMatieresResults().length > 0 ? (
-                        filterMatieresResults().map((matiere) => (
+                          filterMatieresResults().map((matiere) => (
                             <div
-                            key={matiere.id}
-                            className="p-2 hover:bg-gray-100 cursor-pointer border-t border-gray-200"
-                            onClick={() => {
+                              key={matiere.id}
+                              className="p-2 hover:bg-gray-100 cursor-pointer border-t border-gray-200"
+                              onClick={() => {
                                 if (isEditing) {
-                                setEditingSession({ ...editingSession, matieres_id: matiere.id });
+                                  setEditingSession({ ...editingSession, matieres_id: matiere.id });
                                 } else {
-                                setNewSession({ ...newSession, matieres_id: matiere.id });
+                                  setNewSession({ ...newSession, matieres_id: matiere.id });
                                 }
                                 setSelectedMatiereName(`${matiere.name} - ${matiere.classe_name || "Sans classe"} (${matiere.professeur_name ? `${matiere.professeur_name} ${matiere.professeur_firstname}` : "Sans professeur"})`);
                                 setShowMatieresList(false);
-                            }}
+                              }}
                             >
-                            <div className="font-medium">{matiere.name}</div>
-                            <div className="text-sm text-gray-600 flex justify-between">
+                              <div className="font-medium">{matiere.name}</div>
+                              <div className="text-sm text-gray-600 flex justify-between">
                                 <span>{matiere.classe_name || "Sans classe"}</span>
                                 <span>{matiere.professeur_name ? `${matiere.professeur_name} ${matiere.professeur_firstname}` : "Sans professeur"}</span>
+                              </div>
                             </div>
-                            </div>
-                        ))
+                          ))
                         ) : (
-                        <div className="p-3 text-center text-gray-500">Aucune matière trouvée</div>
+                          <div className="p-3 text-center text-gray-500">Aucune matière trouvée</div>
                         )}
-                    </div>
+                      </div>
                     )}
-                    {isEditing || newSession.matieres_id ? (
-                    <div className="mt-2 p-2 bg-gray-100 rounded flex justify-between">
+                    {(isEditing || newSession.matieres_id) && selectedMatiereName && (
+                      <div className="mt-2 p-2 bg-gray-100 rounded flex justify-between">
                         <span>{selectedMatiereName}</span>
                         <button 
-                        className="text-red-500"
-                        onClick={() => {
+                          className="text-red-500"
+                          onClick={() => {
                             if (isEditing) {
-                            setEditingSession({ ...editingSession, matieres_id: "" });
+                              setEditingSession({ ...editingSession, matieres_id: "" });
                             } else {
-                            setNewSession({ ...newSession, matieres_id: "" });
+                              setNewSession({ ...newSession, matieres_id: "" });
                             }
                             setSelectedMatiereName("");
-                        }}
+                          }}
                         >
-                        ×
+                          <X size={16} />
                         </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={isEditing ? editingSession.date : newSession.date}
+                      onChange={(e) => isEditing 
+                        ? setEditingSession({ ...editingSession, date: e.target.value })
+                        : setNewSession({ ...newSession, date: e.target.value })
+                      }
+                      className="w-full p-2 border border-gray-300 rounded pl-10 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  </div>
+                </div>
+                
+                <div className="flex gap-4 mb-4">
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Heure de début *</label>
+                    <div className="relative">
+                      <input
+                        type="time"
+                        value={isEditing ? editingSession.start_time : newSession.start_time}
+                        onChange={(e) => isEditing 
+                          ? setEditingSession({ ...editingSession, start_time: e.target.value })
+                          : setNewSession({ ...newSession, start_time: e.target.value })
+                        }
+                        className="w-full p-2 border border-gray-300 rounded pl-10 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                      <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                     </div>
-                    ) : null}
+                  </div>
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Heure de fin *</label>
+                    <div className="relative">
+                      <input
+                        type="time"
+                        value={isEditing ? editingSession.end_time : newSession.end_time}
+                        onChange={(e) => isEditing 
+                          ? setEditingSession({ ...editingSession, end_time: e.target.value })
+                          : setNewSession({ ...newSession, end_time: e.target.value })
+                        }
+                        className="w-full p-2 border border-gray-300 rounded pl-10 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                      <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    </div>
+                  </div>
                 </div>
-                </div>
-              
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-1">Date *</label>
-                <div className="relative">
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Salle</label>
                   <input
-                    type="date"
-                    value={isEditing ? editingSession.date : newSession.date}
+                    type="text"
+                    placeholder="Salle (optionnel)"
+                    value={isEditing ? editingSession.salle : newSession.salle}
                     onChange={(e) => isEditing 
-                      ? setEditingSession({ ...editingSession, date: e.target.value })
-                      : setNewSession({ ...newSession, date: e.target.value })
+                      ? setEditingSession({ ...editingSession, salle: e.target.value })
+                      : setNewSession({ ...newSession, salle: e.target.value })
                     }
-                    className="p-2 border border-gray-300 rounded w-full pl-10"
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                 </div>
-              </div>
-              
-              <div className="flex gap-4 mb-4">
-                <div className="w-1/2">
-                  <label className="block text-gray-700 mb-1">Heure de début *</label>
-                  <div className="relative">
-                    <input
-                      type="time"
-                      value={isEditing ? editingSession.start_time : newSession.start_time}
-                      onChange={(e) => isEditing 
-                        ? setEditingSession({ ...editingSession, start_time: e.target.value })
-                        : setNewSession({ ...newSession, start_time: e.target.value })
-                      }
-                      className="p-2 border border-gray-300 rounded w-full pl-10"
-                    />
-                    <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                  </div>
+                
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 bg-white border border-gray-300 rounded text-gray-700 text-sm hover:bg-gray-50"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={isEditing ? updateSession : addSession}
+                    className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                  >
+                    {isEditing ? "Mettre à jour" : "Ajouter"}
+                  </button>
                 </div>
-                <div className="w-1/2">
-                  <label className="block text-gray-700 mb-1">Heure de fin *</label>
-                  <div className="relative">
-                    <input
-                      type="time"
-                      value={isEditing ? editingSession.end_time : newSession.end_time}
-                      onChange={(e) => isEditing 
-                        ? setEditingSession({ ...editingSession, end_time: e.target.value })
-                        : setNewSession({ ...newSession, end_time: e.target.value })
-                      }
-                      className="p-2 border border-gray-300 rounded w-full pl-10"
-                    />
-                    <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-1">Salle</label>
-                <input
-                  type="text"
-                  placeholder="Salle (optionnel)"
-                  value={isEditing ? editingSession.salle : newSession.salle}
-                  onChange={(e) => isEditing 
-                    ? setEditingSession({ ...editingSession, salle: e.target.value })
-                    : setNewSession({ ...newSession, salle: e.target.value })
-                  }
-                  className="p-2 border border-gray-300 rounded w-full"
-                />
-              </div>
-              
-              <div className="flex justify-end space-x-2">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="p-2 bg-gray-500 text-white rounded"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={isEditing ? updateSession : addSession}
-                  className="p-2 bg-blue-500 text-white rounded"
-                >
-                  {isEditing ? "Mettre à jour" : "Ajouter"}
-                </button>
               </div>
             </div>
           </div>
