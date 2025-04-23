@@ -55,6 +55,18 @@ const getProfById = async (req, res) => {
   }
 };
 
+const generateProfId = async () => {
+  let id;
+  let exists = true;
+  while (exists) {
+    // Génère un ID à 5 chiffres (entre 10000 et 99999)
+    id = Math.floor(10000 + Math.random() * 90000);
+    const result = await pool.query('SELECT 1 FROM professeurs WHERE id = $1', [id]);
+    exists = result.rowCount > 0;
+  }
+  return id;
+};
+
 const createProf = async (req, res) => {
   const { name, firstname, password } = req.body;
   
@@ -72,12 +84,13 @@ const createProf = async (req, res) => {
       return res.status(409).json({ error: 'Un professeur avec ce nom et prénom existe déjà' });
     }
     
+    const id = await generateProfId();
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     
     const result = await pool.query(
-      'INSERT INTO professeurs (name, firstname, password) VALUES ($1, $2, $3) RETURNING id, name, firstname',
-      [name, firstname, hashedPassword]
+      'INSERT INTO professeurs (id, name, firstname, password) VALUES ($1, $2, $3, $4) RETURNING id, name, firstname',
+      [id, name, firstname, hashedPassword]
     );
     
     res.status(201).json(result.rows[0]);
