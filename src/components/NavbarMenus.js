@@ -31,12 +31,7 @@ export default function NavbarMenus() {
           "ACCUEIL",
           "PLANNING",
           "NOTES",
-          "SCOLARITÉ",
-          "L'ÉCOLE",
-          "VIE ÉTUDIANTE",
-          "STAGES ET ALTERNANCES",
-          "OUTILS",
-          "AIDES",
+          "CAMPUS",
         ];
       default:
         return [];
@@ -56,12 +51,7 @@ export default function NavbarMenus() {
     if (path === '/prof/courses') return 'COURS';
     if (path === '/prof/notes') return 'NOTES';
     if (path === '/prof/messages') return 'MESSAGES';
-    if (path === '/eleve/school') return 'SCOLARITÉ';
-    if (path === '/eleve/school-info') return 'L\'ÉCOLE';
-    if (path === '/eleve/student-life') return 'VIE ÉTUDIANTE';
-    if (path === '/eleve/internships') return 'STAGES ET ALTERNANCES';
-    if (path === '/eleve/tools') return 'OUTILS';
-    if (path === '/eleve/help') return 'AIDES';
+    if (path === '/eleve/school') return 'CAMPUS';
     return '';
   };
 
@@ -116,23 +106,8 @@ export default function NavbarMenus() {
       case 'MESSAGES':
         navigate('/prof/messages');
         break;
-      case 'SCOLARITÉ':
+      case 'CAMPUS':
         navigate('/eleve/school');
-        break;
-      case 'L\'ÉCOLE':
-        navigate('/eleve/school-info');
-        break;
-      case 'VIE ÉTUDIANTE':
-        navigate('/eleve/student-life');
-        break;
-      case 'STAGES ET ALTERNANCES':
-        navigate('/eleve/internships');
-        break;
-      case 'OUTILS':
-        navigate('/eleve/tools');
-        break;
-      case 'AIDES':
-        navigate('/eleve/help');
         break;
       default:
         break;
