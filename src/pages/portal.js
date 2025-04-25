@@ -10,7 +10,6 @@ export default function MyEfreiPage() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [selectedNews, setSelectedNews] = useState(null);
   
-  // Utilisé pour afficher le carousel
   const events = [
     {
       id: 1,
@@ -59,7 +58,6 @@ export default function MyEfreiPage() {
     }
   ];
   
-  // Données simulées pour les actualités avec catégories
   const allNews = [
     {
       id: 1,
@@ -117,13 +115,10 @@ export default function MyEfreiPage() {
     }
   ];
   
-  // Filtrer les actualités en fonction du filtre actif
   const filteredNews = allNews.filter(item => item.category === activeNewsFilter);
   
-  // Si aucune actualité ne correspond au filtre, afficher un placeholder
   const newsToDisplay = filteredNews.length > 0 ? filteredNews : [];
   
-  // Données pour les événements avec plus de détails
   const upcomingEvents = [
     {
       id: 1,
@@ -202,7 +197,6 @@ export default function MyEfreiPage() {
       <Navbar />
       <NavbarMenus />
       
-      {/* Carousel - avec effet de box */}
       <div className="relative max-w-6xl mx-auto px-4 mt-6">
         <div className="relative overflow-hidden rounded-lg bg-white shadow-md">
           {events.map((event, index) => (
@@ -211,13 +205,12 @@ export default function MyEfreiPage() {
                 key={event.id}
                 src={event.image} 
                 alt={event.title} 
-                className="w-full object-contain" // Remplacé h-64 par object-contain
-                style={{ maxHeight: "400px" }}    // Ajout d'une hauteur maximale
+                className="w-full object-contain"
+                style={{ maxHeight: "400px" }}
               />
             )
           ))}
           
-          {/* Navigation buttons */}
           <button 
             className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/30 p-2 rounded-full"
             onClick={() => setActiveSlide((prev) => (prev === 0 ? events.length - 1 : prev - 1))}
@@ -232,28 +225,24 @@ export default function MyEfreiPage() {
           </button>
         </div>
         
-        {/* Pagination dots - Affiche 9 points fixes */}
           <div className="flex justify-center gap-2 mt-4 mb-2">
             {[0, 1, 2, 3, 4].map((index) => (
               <button 
                 key={index} 
                 className={`h-2 w-2 rounded-full ${activeSlide === index ? 'bg-blue-900' : 'bg-gray-300'}`}
-                onClick={() => setActiveSlide(index % events.length)} // Pour éviter les erreurs si on clique sur un point sans slide correspondant
+                onClick={() => setActiveSlide(index % events.length)}
               />
             ))}
           </div>
         </div>
       
-      {/* Main content with Actualités and Événements side by side */}
       <div className="max-w-6xl mx-auto px-4 mt-10 flex flex-col lg:flex-row gap-8">
-        {/* Actualités Section - avec effet de box */}
         <div className="bg-white rounded-lg shadow-md p-6 flex-1">
           <section>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-blue-900">Actualités</h2>
             </div>
             
-            {/* Tags filtrants */}
             <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
               <button 
                 className={`px-4 py-1 text-xs rounded whitespace-nowrap ${activeNewsFilter === 'À LA UNE' ? 'bg-blue-900 text-white' : 'bg-gray-200 text-gray-800'}`}
@@ -281,7 +270,6 @@ export default function MyEfreiPage() {
               </button>
             </div>
             
-            {/* News grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {newsToDisplay.length > 0 ? (
                 newsToDisplay.map((item) => (
@@ -304,14 +292,12 @@ export default function MyEfreiPage() {
                   </div>
                 ))
               ) : (
-                // Pas de placeholder - on laisse simplement un espace vide
                 <div className="col-span-2"></div>
               )}
             </div>
           </section>
         </div>
         
-        {/* Événements Section - avec effet de box et événements cliquables */}
         <div className="bg-white rounded-lg shadow-md p-6 lg:w-72">
           <h2 className="text-xl font-semibold text-blue-900 mb-4">Événements</h2>
           {upcomingEvents.map(event => (
@@ -336,7 +322,6 @@ export default function MyEfreiPage() {
         </div>
       </div>
       
-      {/* Event Popup Modal */}
       {selectedEvent && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 relative">
@@ -378,7 +363,6 @@ export default function MyEfreiPage() {
         </div>
       )}
       
-      {/* News Detail Modal */}
       {selectedNews && (
         <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
           <div className="max-w-4xl mx-auto px-4 py-6">
@@ -405,8 +389,7 @@ export default function MyEfreiPage() {
                 className="w-full h-auto object-cover rounded-md mb-4"
               />
             </div>
-            
-            {/* Contenu spécifique pour chaque article basé sur son ID */}
+
             {selectedNews.id === 1 && (
               <div className="prose max-w-none">
                 <p className="mb-4">Dans le cadre de leur projet fil rouge, nos étudiants en B1MDC des campus de Paris et Bordeaux ont réalisé 10 courts métrages sur le thème de la vie étudiante à l'Efrei.</p>
@@ -540,7 +523,6 @@ export default function MyEfreiPage() {
         </div>
       )}
       
-      {/* Social media section - avec effet de box */}
       <div className="max-w-6xl mx-auto px-4 mt-10 mb-10">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold text-blue-900 mb-4">Sur les réseaux</h2>
@@ -561,10 +543,8 @@ export default function MyEfreiPage() {
             </button>
           </div>
           
-          {/* Social media content */}
           {activeTab === 'YOUTUBE' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Première vidéo - My Very Good Trip */}
               <a href="https://www.youtube.com/watch?v=UxnY6K-hVuQ&ab_channel=Efrei" target="_blank" rel="noopener noreferrer" className="block">
                 <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 h-full">
                   <div className="relative">
@@ -589,7 +569,6 @@ export default function MyEfreiPage() {
                 </div>
               </a>
               
-              {/* Deuxième vidéo - Bourse Program'her */}
               <a href="https://www.youtube.com/watch?v=6IqchSnl4HE&ab_channel=Efrei" target="_blank" rel="noopener noreferrer" className="block">
                 <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 h-full">
                   <div className="relative">
@@ -615,9 +594,7 @@ export default function MyEfreiPage() {
               </a>
             </div>
           ) : (
-            // Instagram Content
             <div className="space-y-4">
-              {/* Premier post Instagram */}
               <a href="https://www.instagram.com/p/DDJ6wTrCZz6/?img_index=1" target="_blank" rel="noopener noreferrer" className="block">
                 <div className="border-b pb-4">
                   <p className="text-sm text-gray-600 mb-2">04 décembre 2024</p>
@@ -627,7 +604,6 @@ export default function MyEfreiPage() {
                 </div>
               </a>
 
-              {/* Deuxième post Instagram */}
               <a href="https://www.instagram.com/p/DDEpXGXsbgj/?img_index=1" target="_blank" rel="noopener noreferrer" className="block">
                 <div className="border-b pb-4">
                   <p className="text-sm text-gray-600 mb-2">02 décembre 2024</p>
@@ -637,7 +613,6 @@ export default function MyEfreiPage() {
                 </div>
               </a>
 
-              {/* Troisième post Instagram */}
               <a href="https://www.instagram.com/reel/DC8yotjIGZe/" target="_blank" rel="noopener noreferrer" className="block">
                 <div className="pb-4">
                   <p className="text-sm text-gray-600 mb-2">29 novembre 2024</p>

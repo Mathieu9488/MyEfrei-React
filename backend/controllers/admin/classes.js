@@ -27,6 +27,33 @@ const addClass = async (req, res) => {
     }
   };
 
+  const updateClass = async (req, res) => {
+    const { id } = req.params;
+    const { name } = req.body;
+  
+    if (!name) {
+      return res.status(400).json({ error: 'Le nom de la classe est requis' });
+    }
+  
+    try {
+      const classResult = await pool.query('SELECT * FROM classes WHERE id = $1', [id]);
+      
+      if (classResult.rowCount === 0) {
+        return res.status(404).json({ error: 'Classe non trouvée' });
+      }
+  
+      const updatedClassResult = await pool.query(
+        'UPDATE classes SET name = $1 WHERE id = $2 RETURNING *',
+        [name, id]
+      );
+  
+      res.status(200).json(updatedClassResult.rows[0]);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la classe:', error);
+      res.status(500).json({ error: 'Erreur lors de la mise à jour de la classe' });
+    }
+  };
+
   const getElevesByClassId = async (req, res) => {
     const { id } = req.params;
     try {
@@ -49,4 +76,4 @@ const addClass = async (req, res) => {
     }
   };
 
-module.exports = { getClasses, addClass, getElevesByClassId };
+  module.exports = { getClasses, addClass, updateClass, getElevesByClassId };
