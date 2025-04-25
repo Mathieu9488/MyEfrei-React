@@ -74,10 +74,9 @@ export default function AdminProfesseursPage() {
 
   const deleteProfesseur = async (id) => {
     try {
-      await fetch(`${process.env.REACT_APP_BACKEND_URL}/admin/professeurs`, {
+      await fetch(`${process.env.REACT_APP_BACKEND_URL}/admin/professeurs/${id}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        headers: { "Content-Type": "application/json" }
       });
       fetchProfesseurs();
     } catch (error) {

@@ -312,14 +312,15 @@ export default function ProfNotes() {
   };
   
   const deleteEvaluation = async (evaluationId) => {
-        
     const evaluation = evaluations.find(e => e.id === evaluationId);
     
     try {
       const noteIds = Object.values(evaluation.notes).map(n => n.id);
       
-      for (const noteId of noteIds) {
-        await fetch(`${process.env.REACT_APP_BACKEND_URL}/prof/notes/${noteId}`, {
+      setEvaluations(prevEvaluations => prevEvaluations.filter(e => e.id !== evaluationId));
+      
+      const deletePromises = noteIds.map(noteId => 
+        fetch(`${process.env.REACT_APP_BACKEND_URL}/prof/notes/${noteId}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -327,10 +328,10 @@ export default function ProfNotes() {
           body: JSON.stringify({
             professorId: auth.user.id
           }),
-        });
-      }
+        })
+      );
       
-      fetchNotesByMatiere(selectedMatiereId);
+      await Promise.all(deletePromises);
       
       setNotification({
         type: 'success',
@@ -342,6 +343,9 @@ export default function ProfNotes() {
       }, 3000);
     } catch (err) {
       console.error("Erreur:", err);
+      
+      fetchNotesByMatiere(selectedMatiereId);
+      
       setNotification({
         type: 'error',
         message: 'Erreur lors de la suppression de l\'évaluation'
