@@ -1,147 +1,114 @@
-# MyEfrei-React - Guide de développement
+# MyEfrei-React
 
-Ce README détaille comment configurer et exécuter le projet MyEfrei-React, une application de gestion scolaire avec un frontend React et un backend Node.js.
+## Description
 
-## Table des matières
+MyEfrei est une plateforme éducative complète développée pour l'Efrei, offrant des fonctionnalités adaptées aux étudiants, professeurs et administrateurs. Cette application web permet la gestion des cours, des notes, des emplois du temps, et plus encore.
 
-1. [Prérequis](#prérequis)
-2. [Installation](#installation)
-3. [Configuration](#configuration)
-4. [Démarrage du projet](#démarrage-du-projet)
-5. [Identifiants de connexion](#identifiants-de-connexion)
-6. [Structure du projet](#structure-du-projet)
-7. [Routes principales](#routes-principales)
-8. [Développement](#développement)
+## Technologies utilisées
 
-## Prérequis
-
-- [Node.js](https://nodejs.org/) (v14+)
-- [npm](https://www.npmjs.com/) (v6+)
-- [Docker](https://www.docker.com/) et [Docker Compose](https://docs.docker.com/compose/)
-- [Git](https://git-scm.com/)
+- **Frontend** : React.js, Tailwind CSS
+- **Backend** : Node.js, Express
+- **Base de données** : PostgreSQL
+- **Autres librairies** :
+  - date-fns pour la manipulation des dates
+  - lucide-react pour les icônes
+  - react-router-dom pour la navigation
 
 ## Installation
 
-1. Cloner le dépôt :
+### Prérequis
+
+- Docker et Docker Compose
+
+### Étapes d'installation
+
+1. Clonez le dépôt
+
    ```bash
-   git clone https://github.com/Mathieu9488/MyEfrei-React.git
+   git clone https://github.com/votre-username/MyEfrei-React.git
    cd MyEfrei-React
    ```
-2. Installer les dépendances du frontend :
-    ```bash
-    npm install
-    ```
+2. Utilisez Docker Compose pour construire et démarrer l'application
 
-3. Installer les dépendances du backend :
-    ```bash
-    cd backend
-    npm install
-    cd ..
-    ```
+   ```bash
+   docker compose up --build
+   ```
 
-## Configuration
+   Cette commande va:
 
-1. Créer un fichier .env à la racine du projet en copiant le fichier .env.example :
-    ```bash
-    cp .env.example .env
-    ```
+   - Construire les images Docker pour le frontend et le backend
+   - Configurer la base de données PostgreSQL
+   - Démarrer tous les services nécessaires
+3. Accédez à l'application dans votre navigateur à l'adresse `http://localhost:3000`
 
-2. Le contenu du fichier .env devrait ressembler à ceci :
-    ```
-    REACT_APP_FRONTEND_URL=http://localhost:3000
-    REACT_APP_BACKEND_URL=http://localhost:3001
-    REACT_APP_DB_URL=postgresql://user:password@localhost:5432/mydatabase
-    JWT_SECRET=votre_secret_jwt_ici
-    ```
+## Fonctionnalités
 
-3. Vous pouvez laisser les valeurs par défaut pour le développement local.
+### Pour les étudiants
 
-## Démarrage du projet
+- Consultation de l'emploi du temps
+- Visualisation des notes et calcul des moyennes
+- Informations sur les campus et sites de l'école
+- Actualités et événements de l'école
 
-Le projet comprend un script simplifié pour lancer l'environnement de développement complet :
+### Pour les professeurs
 
-```bash
-npm run dev
-```
+- Gestion des notes et évaluations
+- Consultation des cours à dispenser
+- Communication avec les étudiants
 
-Ce script :
-1. Démarre la base de données PostgreSQL dans un conteneur Docker
-2. Lance le serveur backend avec nodemon (rechargement automatique)
-3. Démarre le serveur de développement React
+### Pour les administrateurs
 
-Vous pouvez également lancer les composants séparément :
-
-- Base de données uniquement : `npm run start:db`
-- Backend uniquement : `npm run start:back`
-- Frontend uniquement : `npm start`
-
-## Identifiants de connexion
-
-Le fichier init.sql initialise la base de données avec des utilisateurs par défaut :
-
-### Administrateur
-- **ID** : 1
-- **Mot de passe** : admin
-
-### Professeur
-- **ID** : 10000
-- **Mot de passe** : prof
+- Gestion des comptes étudiants et professeurs
+- Gestion des classes
+- Gestion des matières et leur attribution
+- Planification des sessions de cours
 
 ## Structure du projet
 
 ```
 MyEfrei-React/
-├── backend/                  # Code du serveur Node.js/Express
-│   ├── controllers/          # Logique métier
-│   ├── db/                   # Scripts de base de données
-│   ├── routes/               # Définition des routes API
-│   ├── server.js             # Point d'entrée du backend
-│   └── package.json          # Dépendances du backend
-├── public/                   # Fichiers statiques
-├── src/                      # Code source React
-│   ├── components/           # Composants réutilisables
-│   ├── context/              # Contextes React (Auth, etc.)
-│   ├── css/                  # Styles CSS
-│   ├── pages/                # Pages de l'application
-│   │   ├── admin/            # Pages d'administration
+├── public/               # Fichiers statiques
+├── src/                  # Code source React
+│   ├── components/       # Composants réutilisables
+│   ├── context/          # Contextes React (AuthContext, etc.)
+│   ├── pages/            # Pages de l'application
+│   │   ├── admin/        # Pages pour les administrateurs
+│   │   ├── eleve/        # Pages pour les étudiants
+│   │   ├── prof/         # Pages pour les professeurs
 │   │   └── ...
-│   ├── App.js                # Composant principal
-│   └── routes.js             # Configuration des routes
-├── .env                      # Variables d'environnement
-├── .env.example              # Exemple de variables d'environnement
-├── docker-compose.yml        # Configuration Docker
-└── package.json              # Dépendances et scripts du projet
+│   └── ...
+└── backend/              # Code serveur
+    ├── controllers/      # Contrôleurs par rôle
+    ├── db/               # Configuration de la base de données
+    ├── routes/           # Routes API
+    └── ...
 ```
 
-## Routes principales
+## Pages principales
 
-### Frontend
-- `/` - Page d'accueil
-- `/login` - Page de connexion
-- `/portal` - Portail principal après connexion
-- `/admin/*` - Pages d'administration
-  - `/admin/eleves` - Gestion des élèves
-  - `/admin/professeurs` - Gestion des professeurs
-  - `/admin/classes` - Gestion des classes
-  - `/admin/matieres` - Gestion des matières
-  - `/admin/sessions` - Gestion des sessions (cours)
+1. **Portal** - Accueil et actualités de l'école
+2. **Planning** - Emploi du temps des cours
+3. **Notes** - Consultation et gestion des notes
+4. **Campus** - Informations sur les différents sites de l'école
+5. **Administration** - Gestion des utilisateurs, classes, matières, etc.
 
-### Backend API
-- `/login` - Authentification
-- `/admin/eleves` - API de gestion des élèves
-- `/admin/professeurs` - API de gestion des professeurs
-- `/admin/classes` - API de gestion des classes
-- `/admin/matieres` - API de gestion des matières
-- `/admin/sessions` - API de gestion des sessions
+## Identifiants de connexion
 
-## Développement
+### Administrateur
 
-### Base de données
+- Identifiant : admin
+- Mot de passe : admin
 
-La base de données est initialisée avec des tables pour :
-- `eleves` - Données des élèves
-- `professeurs` - Données des professeurs
-- `admins` - Données des administrateurs
-- `classes` - Informations sur les classes
-- `matieres` - Matières enseignées
-- `sessions` - Cours programmés
+### Professeur
+
+- Identifiant : 10000
+- Mot de passe : prof
+
+### Élève
+
+- Identifiant : 20221112
+- Mot de passe : eleve
+
+## Auteurs
+
+*BESNARD Clément & CRESPIN Mathieu*
