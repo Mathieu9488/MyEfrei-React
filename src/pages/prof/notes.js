@@ -240,12 +240,9 @@ export default function ProfNotes() {
     setNoteForm({ notes: initialNotes });
     setIsAddNoteModalOpen(true);
   };
-
+  
   const saveNotes = async () => {
     const notesToSave = [];
-    const notesToUpdate = [];
-    
-    const evaluation = evaluations.find(e => e.id === selectedEvaluationId);
     
     for (const [eleveId, noteValue] of Object.entries(noteForm.notes)) {
       if (noteValue.trim() !== '') {
@@ -259,29 +256,22 @@ export default function ProfNotes() {
           return;
         }
         
-        const existingNote = evaluation.notes[eleveId];
-        
-        if (existingNote && existingNote.id) {
-          notesToUpdate.push({
-            noteId: existingNote.id,
-            note: parsedNote
-          });
-        } else {
-          notesToSave.push({
-            eleveId: parseInt(eleveId),
-            note: parsedNote
-          });
-        }
+        notesToSave.push({
+          eleveId: parseInt(eleveId),
+          note: parsedNote
+        });
       }
     }
     
-    if (notesToSave.length === 0 && notesToUpdate.length === 0) {
+    if (notesToSave.length === 0) {
       setNotification({
         type: 'error',
         message: 'Aucune note à enregistrer'
       });
       return;
     }
+    
+    const evaluation = evaluations.find(e => e.id === selectedEvaluationId);
     
     try {
       for (const noteData of notesToSave) {
@@ -300,22 +290,8 @@ export default function ProfNotes() {
         });
       }
       
-      for (const noteData of notesToUpdate) {
-        await fetch(`${process.env.REACT_APP_BACKEND_URL}/prof/notes/${noteData.noteId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            professorId: auth.user.id,
-            note: noteData.note,
-            coefficient: evaluation.coefficient,
-            description: evaluation.description
-          }),
-        });
-      }
-      
       fetchNotesByMatiere(selectedMatiereId);
+      
       setIsAddNoteModalOpen(false);
       
       setNotification({
