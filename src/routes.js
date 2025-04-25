@@ -29,6 +29,7 @@ const AppRoutes = () => {
         <Route path="/admin/sessions" element={<ProtectedRoute roles={['admin']}><AdminSessionsPage /></ProtectedRoute>} />
         <Route path="/planning" element={<ProtectedRoute roles={['eleve', 'prof']}><PlanningPage /></ProtectedRoute>} />
         <Route path="/prof/notes" element={<ProtectedRoute roles={['prof']}><ProfNotes /></ProtectedRoute>} />
+        <Route path="/prof/notes/:id" element={<ProtectedRoute roles={['prof']}><ProfNotes /></ProtectedRoute>} />  
         <Route path="/eleve/notes" element={<ProtectedRoute roles={['eleve']}><EleveNotes /></ProtectedRoute>} />
         <Route path="/eleve/school" element={<ProtectedRoute roles={['eleve']}><SchoolPage /></ProtectedRoute>} />
         <Route path="*" element={<ProtectedRoute roles={['eleve', 'admin', 'prof']}><NotFound /></ProtectedRoute>} />

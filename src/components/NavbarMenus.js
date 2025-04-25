@@ -70,7 +70,7 @@ export default function NavbarMenus() {
       } else if (auth?.role === 'eleve') {
         navigate('/eleve/notes');
       }
-      return; // Sortir de la fonction après la redirection
+      return;
     }
     switch (item) {
       case 'ACCUEIL':

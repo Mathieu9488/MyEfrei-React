@@ -6,7 +6,7 @@ import NotFound from '../pages/NotFound';
 const ProtectedRoute = ({ children, roles }) => {
   const { auth, loading } = useAuth();
 
-  if (loading) return <div>Loading...</div>; // Attends le chargement
+  if (loading) return <div>Loading...</div>;
   if (!auth) return <Navigate to="/login" />
 
   if (roles && !roles.includes(auth.role)) {

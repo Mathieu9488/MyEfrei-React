@@ -61,7 +61,6 @@ const getProfesseurProfile = async (req, res) => {
       });
     });
     
-    // Construction de la réponse complète
     const response = {
       professeur: prof,
       matieres: matieresResult.rows,

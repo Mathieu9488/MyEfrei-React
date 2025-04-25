@@ -14,9 +14,8 @@ export default function SchoolPage() {
     lAquarium: false,
     bordeaux: false
   });
-  const [selectedSite, setSelectedSite] = useState('laMaison'); // Default to La maison
+  const [selectedSite, setSelectedSite] = useState('laMaison');
 
-  // Toggle a section open/closed without affecting the map selection
   const toggleSection = (section) => {
     setOpenSections(prev => ({
       ...prev,
@@ -24,12 +23,10 @@ export default function SchoolPage() {
     }));
   };
 
-  // Select site for map display without toggling the section
   const selectMapSite = (site) => {
     setSelectedSite(site);
   };
 
-  // Combined function to both select map site and toggle section
   const handleSiteClick = (site) => {
     selectMapSite(site);
     toggleSection(site);
@@ -41,7 +38,6 @@ export default function SchoolPage() {
     }
   }, [auth, navigate]);
 
-  // Map sources with different markers for each site
   const mapSources = {
     laMaison: `https://www.openstreetmap.org/export/embed.html?bbox=2.358,48.784,2.368,48.792&layer=mapnik&marker=48.7853,2.3628`,
     laFactory: `https://www.openstreetmap.org/export/embed.html?bbox=2.358,48.784,2.368,48.792&layer=mapnik&marker=48.7874,2.3637`,
@@ -57,7 +53,6 @@ export default function SchoolPage() {
         <h1 className="text-3xl font-bold text-center mb-8 text-[#0a2463]">Nos campus</h1>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Map section */}
           <div className="bg-white rounded-lg shadow-md p-6 lg:w-3/5">
             <div className="relative overflow-hidden rounded-lg h-[400px] mb-4">
               <iframe
@@ -71,7 +66,6 @@ export default function SchoolPage() {
               <span>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors</span>
             </div>
           </div>
-          {/* Campus info section */}
           <div className="lg:w-2/5">
             <div className="bg-white rounded-lg shadow-md mb-6">
               <div className="border-b border-gray-200">
@@ -84,7 +78,6 @@ export default function SchoolPage() {
                 </button>
               </div>
               
-              {/* Site La maison */}
               <div className="border-b border-gray-200">
                 <button 
                   className={`w-full p-4 text-left flex justify-between items-center ${selectedSite === 'laMaison' ? 'bg-blue-50' : ''}`}
@@ -134,7 +127,6 @@ export default function SchoolPage() {
                 )}
               </div>
               
-              {/* Site La Factory */}
               <div className="border-b border-gray-200">
                 <button 
                   className={`w-full p-4 text-left flex justify-between items-center ${selectedSite === 'laFactory' ? 'bg-blue-50' : ''}`}
@@ -184,7 +176,6 @@ export default function SchoolPage() {
                 )}
               </div>
               
-              {/* Site L'aquarium */}
               <div className="border-b border-gray-200">
                 <button 
                   className={`w-full p-4 text-left flex justify-between items-center ${selectedSite === 'lAquarium' ? 'bg-blue-50' : ''}`}
@@ -235,7 +226,6 @@ export default function SchoolPage() {
               </div>
             </div>
             
-            {/* Campus Bordeaux */}
             <div className="bg-white rounded-lg shadow-md">
               <div className="border-b border-gray-200">
                 <button 
@@ -247,7 +237,6 @@ export default function SchoolPage() {
                 </button>
               </div>
               
-              {/* Site Bordeaux */}
               <div>
                 <button 
                   className={`w-full p-4 text-left flex justify-between items-center ${selectedSite === 'bordeaux' ? 'bg-blue-50' : ''}`}

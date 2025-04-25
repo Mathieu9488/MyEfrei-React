@@ -1,15 +1,14 @@
 import React from 'react';
 import { useState } from "react";  
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom'; // Importation de useNavigate
+import { useNavigate } from 'react-router-dom';
 import '../css/menu.css';
 
 const Navbar = () => {
   const [showPopup, setShowPopup] = useState(false);
   const { auth, logout } = useAuth();
-  const navigate = useNavigate(); // Hook de navigation
+  const navigate = useNavigate();
   
-  // Fonction pour naviguer vers la page d'accueil
   const goToHome = () => {
     navigate('/portal');
   };

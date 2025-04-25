@@ -295,7 +295,6 @@ export default function AdminSessionsPage() {
       }
     }
 
-    // Appliquer les filtres actifs
     if (activeFilters.id && filterValues.id && 
         !String(session.id).toLowerCase().includes(filterValues.id.toLowerCase())) {
       return false;
